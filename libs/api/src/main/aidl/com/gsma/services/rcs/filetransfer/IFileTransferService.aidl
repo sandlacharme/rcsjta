@@ -30,6 +30,8 @@ interface IFileTransferService {
 
 	IFileTransfer transferFile(in ContactId contact, in Uri file, in boolean attachFileicon);
 
+	IFileTransfer transferAudioMessage(in ContactId contact, in Uri file);
+
 	IFileTransfer transferFileToGroupChat(in String chatId, in Uri file, in boolean attachFileicon);
 
 	void markFileTransferAsRead(in String transferId);

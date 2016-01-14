@@ -33,6 +33,7 @@ import com.gsma.rcs.core.ims.protocol.sdp.SdpParser;
 import com.gsma.rcs.core.ims.protocol.sip.SipRequest;
 import com.gsma.rcs.provider.settings.RcsSettings;
 import com.gsma.rcs.utils.MimeManager;
+import com.gsma.services.rcs.filetransfer.FileTransferLog;
 
 import android.net.Uri;
 
@@ -136,6 +137,10 @@ public class ContentManager {
             }
             if (MimeManager.isGeolocType(mime)) {
                 return new GeolocContent(uri, size, fileName);
+            }
+            if (FileTransferLog.MimeType.AUDIO_MESSAGE.equals(mime)) {
+                // TODO
+                return null;
             }
         }
         return new FileContent(uri, size, fileName);

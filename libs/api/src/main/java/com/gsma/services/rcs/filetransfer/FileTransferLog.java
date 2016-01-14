@@ -233,4 +233,15 @@ public class FileTransferLog {
      */
     public static final long UNKNOWN_EXPIRATION = 0L;
 
+    /**
+     * Message MIME-types
+     */
+    public static class MimeType {
+
+        /**
+         * MIME-type of audio messages
+         */
+        public static final String AUDIO_MESSAGE = "application/audio-message";
+
+    }
 }

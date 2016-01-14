@@ -110,21 +110,22 @@ public class FileTransferServiceConfiguration {
         mIFtServiceConfig = iFtServiceConfig;
     }
 
+
     /**
-     * Returns the file transfer size threshold when the user should be warned about the potential
-     * charges associated to the transfer of a large file. It returns 0 if there no need to warn.
-     * 
+     * TODO
+     *
      * @return long Size in bytes
      * @throws RcsGenericException
      */
-    public long getWarnSize() throws RcsGenericException {
+    public long getMaxAudioMessageDuration() throws RcsGenericException {
         try {
-            return mIFtServiceConfig.getWarnSize();
+            return mIFtServiceConfig.getMaxAudioMessageDuration();
 
         } catch (Exception e) {
             throw new RcsGenericException(e);
         }
     }
+
 
     /**
      * Returns the file transfer size limit. It returns 0 if there is no limitation.

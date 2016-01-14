@@ -152,6 +152,7 @@
     <string name="title_multi_file_transfer">Multiple file transfer</string>
     <string name="label_pause_ft_not_allowed">Cannot pause HTTP file transfer</string>
     <string name="label_resume_ft_not_allowed">Cannot resume HTTP file transfer</string>
+    <string name="menu_transfer_audio_msg">Transfer an audi message</string>
 
     <!-- Chat menu -->
     <string name="menu_initiate_chat">Initiate single chat</string>

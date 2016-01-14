@@ -38,12 +38,13 @@ public class TestFileTransferApi extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Set layout
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        // Set items
+        /* Set items */
         String[] items = {
-                getString(R.string.menu_transfer_file), getString(R.string.menu_file_transfer_log),
+                getString(R.string.menu_transfer_file),
+                getString(R.string.menu_transfer_audio_msg),
+                getString(R.string.menu_file_transfer_log),
                 getString(R.string.menu_file_transfer_config)
         };
         setListAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items));
@@ -57,10 +58,14 @@ public class TestFileTransferApi extends ListActivity {
                 break;
 
             case 1:
-                startActivity(new Intent(this, FileTransferList.class));
+                // TODO
                 break;
 
             case 2:
+                startActivity(new Intent(this, FileTransferList.class));
+                break;
+
+            case 3:
                 startActivity(new Intent(this, FileTransferServiceConfigActivity.class));
                 break;
         }

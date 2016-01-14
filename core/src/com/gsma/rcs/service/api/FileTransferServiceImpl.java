@@ -61,6 +61,7 @@ import com.gsma.services.rcs.contact.ContactId;
 import com.gsma.services.rcs.filetransfer.FileTransfer;
 import com.gsma.services.rcs.filetransfer.FileTransfer.ReasonCode;
 import com.gsma.services.rcs.filetransfer.FileTransfer.State;
+import com.gsma.services.rcs.filetransfer.FileTransferLog;
 import com.gsma.services.rcs.filetransfer.IFileTransfer;
 import com.gsma.services.rcs.filetransfer.IFileTransferService;
 import com.gsma.services.rcs.filetransfer.IFileTransferServiceConfiguration;
@@ -656,6 +657,51 @@ public class FileTransferServiceImpl extends IFileTransferService.Stub {
             /* Always insert with State QUEUED */
             addOutgoingOneToOneFileTransfer(fileTransferId, contact, content, fileIconContent,
                     State.QUEUED, timestamp, timestampSent);
+
+            OneToOneFileTransferImpl oneToOneFileTransfer = getOrCreateOneToOneFileTransfer(fileTransferId);
+            mImService.tryToDequeueFileTransfers();
+            return oneToOneFileTransfer;
+
+        } catch (ServerApiBaseException e) {
+            if (!e.shouldNotBeLogged()) {
+                sLogger.error(ExceptionUtil.getFullStackTrace(e));
+            }
+            throw e;
+
+        } catch (Exception e) {
+            sLogger.error(ExceptionUtil.getFullStackTrace(e));
+            throw new ServerApiGenericException(e);
+        }
+    }
+
+    @Override
+    public IFileTransfer transferAudioMessage(ContactId contact, Uri file) throws RemoteException {
+        if (contact == null) {
+            throw new ServerApiIllegalArgumentException("contact must not be null!");
+        }
+        if (file == null) {
+            throw new ServerApiIllegalArgumentException("file must not be null!");
+        }
+        if (!FileUtils.isReadFromUriPossible(mCtx, file)) {
+            throw new ServerApiIllegalArgumentException("file '" + file.toString()
+                    + "' must refer to a file that exists and that is readable by stack!");
+        }
+        if (sLogger.isActivated()) {
+            sLogger.info("Transfer file " + file + " to " + contact +")");
+        }
+        try {
+            FileDescription fileDescription = FileFactory.getFactory().getFileDescription(file);
+            final MmContent content = ContentManager.createMmContentFromMime(file, FileTransferLog.MimeType.AUDIO_MESSAGE,
+                    fileDescription.getSize(), fileDescription.getName());
+
+            final String fileTransferId = IdGenerator.generateMessageID();
+            final long timestamp = System.currentTimeMillis();
+            /* For outgoing file transfer, timestampSent = timestamp */
+            final long timestampSent = timestamp;
+            // TODO implement session for audio message
+            /* Always insert with State QUEUED */
+//            addOutgoingOneToOneFileTransfer(fileTransferId, contact, content, fileIconContent,
+//                    State.QUEUED, timestamp, timestampSent);
 
             OneToOneFileTransferImpl oneToOneFileTransfer = getOrCreateOneToOneFileTransfer(fileTransferId);
             mImService.tryToDequeueFileTransfers();
