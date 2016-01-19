@@ -71,6 +71,7 @@ public class RcsSettings {
      */
     private static final int GROUP_CHAT_SUBJECT_MAX_LENGTH = 50;
 
+
     private static final String WHERE_CLAUSE = new StringBuilder(RcsSettingsData.KEY_KEY).append(
             "=?").toString();
 
@@ -908,6 +909,16 @@ public class RcsSettings {
      */
     public long getMaxVideoShareDuration() {
         return readLong(RcsSettingsData.MAX_VIDEO_SHARE_DURATION);
+    }
+
+
+    /**
+     * Get max audio message duration of a video share
+     *
+     * @return Duration in milliseconds
+     */
+    public long getMaxAudioMessageDuration() {
+        return readLong(RcsSettingsData.MAX_AUDIO_MESSAGE_DURATION);
     }
 
     /**

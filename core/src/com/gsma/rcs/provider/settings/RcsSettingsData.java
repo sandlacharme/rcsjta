@@ -530,6 +530,13 @@ public class RcsSettingsData {
     public static final String MAX_VIDEO_SHARE_DURATION = "MaxVideoShareDuration";
     /* package private */static final Long DEFAULT_MAX_VSH_DURATION = 54000000L;
 
+
+    /**
+     * Max Audio Message Duration in millisecond
+     */
+    public static final String MAX_AUDIO_MESSAGE_DURATION = "MaxAudioMessageDuration";
+    /* package private */static final Long DEFAULT_MAX_AUDIO_DURATION = 600000L;
+
     /**
      * Max number of simultaneous chat sessions
      */
@@ -633,6 +640,9 @@ public class RcsSettingsData {
     public static final String KEY_DEFAULT_MESSAGING_METHOD = "DefaultMessagingMethod";
     /* package private */static final Integer DEFAULT_KEY_DEFAULT_MESSAGING_METHOD = MessagingMethod.AUTOMATIC
             .toInt();
+
+
+
 
     // ---------------------------------------------------------------------------
     // User profile settings

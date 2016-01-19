@@ -78,7 +78,7 @@ public class RcsSettingsProvider extends ContentProvider {
     }
 
     private static class DatabaseHelper extends SQLiteOpenHelper {
-        private static final int DATABASE_VERSION = 115;
+        private static final int DATABASE_VERSION = 116;
 
         /**
          * Add a parameter in the db
@@ -157,6 +157,8 @@ public class RcsSettingsProvider extends ContentProvider {
                     RcsSettingsData.DEFAULT_MAX_ISH_SIZE);
             addParameter(db, RcsSettingsData.MAX_VIDEO_SHARE_DURATION,
                     RcsSettingsData.DEFAULT_MAX_VSH_DURATION);
+            addParameter(db, RcsSettingsData.MAX_AUDIO_MESSAGE_DURATION,
+                    RcsSettingsData.DEFAULT_MAX_AUDIO_DURATION);
             addParameter(db, RcsSettingsData.MAX_CHAT_SESSIONS,
                     RcsSettingsData.DEFAULT_MAX_CHAT_SESSIONS);
             addParameter(db, RcsSettingsData.MAX_FILE_TRANSFER_SESSIONS,

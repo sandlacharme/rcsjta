@@ -117,6 +117,8 @@ public class ServiceProvisioning extends Activity {
         setLongEditTextParam(R.id.MaxImageShareSize, RcsSettingsData.MAX_IMAGE_SHARE_SIZE, helper);
         setLongEditTextParam(R.id.MaxVideoShareDuration, RcsSettingsData.MAX_VIDEO_SHARE_DURATION,
                 helper);
+        setLongEditTextParam(R.id.MaxAudioMessageDuration, RcsSettingsData.MAX_AUDIO_MESSAGE_DURATION,
+                helper);
         setIntegerEditTextParam(R.id.MaxChatSessions, RcsSettingsData.MAX_CHAT_SESSIONS, helper);
         setIntegerEditTextParam(R.id.MaxFileTransferSessions,
                 RcsSettingsData.MAX_FILE_TRANSFER_SESSIONS, helper);
@@ -189,7 +191,10 @@ public class ServiceProvisioning extends Activity {
         saveLongEditTextParam(R.id.MaxImageShareSize, RcsSettingsData.MAX_IMAGE_SHARE_SIZE, helper);
         saveLongEditTextParam(R.id.MaxVideoShareDuration, RcsSettingsData.MAX_VIDEO_SHARE_DURATION,
                 helper);
-        saveIntegerEditTextParam(R.id.MaxChatSessions, RcsSettingsData.MAX_CHAT_SESSIONS, helper);
+        saveLongEditTextParam(R.id.MaxAudioMessageDuration, RcsSettingsData.MAX_AUDIO_MESSAGE_DURATION,
+                helper);
+
+                saveIntegerEditTextParam(R.id.MaxChatSessions, RcsSettingsData.MAX_CHAT_SESSIONS, helper);
         saveIntegerEditTextParam(R.id.MaxFileTransferSessions,
                 RcsSettingsData.MAX_FILE_TRANSFER_SESSIONS, helper);
         saveIntegerEditTextParam(R.id.MaxConcurrentOutgoingFileTransferSessions,

@@ -1604,6 +1604,8 @@ public class ProvisioningParser {
         String intUrlFmt = null;
         String maxSizeImageShare = null;
         String maxTimeVideoShare = null;
+        String maxTimeAudiomessage =null;
+
         Node typenode = null;
         if (node == null) {
             return;
@@ -1648,6 +1650,16 @@ public class ProvisioningParser {
                             TYPE_INT)) != null) {
                         mRcsSettings.writeLong(RcsSettingsData.MAX_VIDEO_SHARE_DURATION,
                                 Long.parseLong(maxTimeVideoShare)
+                                        * SECONDS_TO_MILLISECONDS_CONVERSION_RATE);
+                        continue;
+                    }
+                }
+
+                if (maxTimeAudiomessage== null) {
+                    if ((maxTimeAudiomessage = getValueByParamName("MaxTimeAudioMessage", childnode,
+                            TYPE_INT)) != null) {
+                        mRcsSettings.writeLong(RcsSettingsData.MAX_AUDIO_MESSAGE_DURATION,
+                                Long.parseLong(maxTimeAudiomessage)
                                         * SECONDS_TO_MILLISECONDS_CONVERSION_RATE);
                         continue;
                     }
