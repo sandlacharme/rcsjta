@@ -530,7 +530,6 @@ public class RcsSettingsData {
     public static final String MAX_VIDEO_SHARE_DURATION = "MaxVideoShareDuration";
     /* package private */static final Long DEFAULT_MAX_VSH_DURATION = 54000000L;
 
-
     /**
      * Max Audio Message Duration in millisecond
      */
@@ -649,7 +648,7 @@ public class RcsSettingsData {
     // ---------------------------------------------------------------------------
 
     /**
-     * IMS username or username part of the IMPU (for HTTP Digest only)
+     * IMS username or usernamart of the IMPU (for HTTP Digest only)
      */
     public static final String USERPROFILE_IMS_USERNAME = "MyContactId";
     /* package private */static final ContactId DEFAULT_USERPROFILE_IMS_USERNAME = null;

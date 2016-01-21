@@ -77,6 +77,7 @@ public class FileTransferServiceConfigActivity extends RcsActivity {
         }
         try {
             mConfig = getFileTransferApi().getConfiguration();
+
         } catch (RcsServiceException e) {
             showExceptionThenExit(e);
             return;
@@ -198,6 +199,9 @@ public class FileTransferServiceConfigActivity extends RcsActivity {
             tableRow = (TableRow) findViewById(R.id.isAutoAcceptInRoaming);
             tableRow.setVisibility(View.GONE);
         }
+
+        textView = (TextView) findViewById(R.id.ft_maxAudioMsgDuration);
+        textView.setText(Integer.valueOf((int)mConfig.getMaxAudioMessageDuration()).toString());
 
         textView = (TextView) findViewById(R.id.MaxFileTransfers);
         textView.setText(Integer.valueOf(mConfig.getMaxFileTransfers()).toString());

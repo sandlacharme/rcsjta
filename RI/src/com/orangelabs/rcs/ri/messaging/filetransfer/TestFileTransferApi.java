@@ -19,6 +19,7 @@
 package com.orangelabs.rcs.ri.messaging.filetransfer;
 
 import com.orangelabs.rcs.ri.R;
+import com.orangelabs.rcs.ri.messaging.filetransfer.multi.AudioMessageTransfer;
 
 import android.app.ListActivity;
 import android.content.Intent;
@@ -59,6 +60,7 @@ public class TestFileTransferApi extends ListActivity {
 
             case 1:
                 // TODO
+                startActivity(new Intent(this, AudioMessageTransfer.class));
                 break;
 
             case 2:
