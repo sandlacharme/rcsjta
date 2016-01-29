@@ -1,46 +1,56 @@
-package com.orangelabs.rcs.ri.messaging.filetransfer.multi;
+/*******************************************************************************
+ * Software Name : RCS IMS Stack
+ * <p/>
+ * Copyright (C) 2010-2016 Orange.
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
 
-import android.content.DialogInterface;
+
+package com.orangelabs.rcs.ri.messaging.filetransfer;
+
+
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
+
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gsma.services.rcs.RcsServiceException;
-import com.gsma.services.rcs.filetransfer.FileTransfer;
-import com.gsma.services.rcs.filetransfer.FileTransferService;
+
 import com.gsma.services.rcs.filetransfer.FileTransferServiceConfiguration;
-import com.gsma.services.rcs.filetransfer.GroupFileTransferListener;
-import com.gsma.services.rcs.filetransfer.OneToOneFileTransferListener;
+
 import com.orangelabs.rcs.api.connection.ConnectionManager;
 import com.orangelabs.rcs.api.connection.utils.RcsActivity;
 import com.orangelabs.rcs.ri.R;
-import com.orangelabs.rcs.ri.messaging.filetransfer.FileDialog;
-import com.orangelabs.rcs.ri.messaging.filetransfer.FileTransferDAO;
-import com.orangelabs.rcs.ri.messaging.filetransfer.Observer;
-import com.orangelabs.rcs.ri.messaging.filetransfer.RCSMediaPlayer;
-import com.orangelabs.rcs.ri.messaging.filetransfer.RCSRecorder;
-import com.orangelabs.rcs.ri.messaging.filetransfer.ReceiveFileTransfer;
 import com.orangelabs.rcs.ri.utils.LogUtils;
 
 import java.io.File;
+import java.io.IOException;
 
-/**
- * Created by sandrine on 20/01/2016.
- */
+
 public class AudioMessageTransfer extends RcsActivity {
     private FileTransferServiceConfiguration mConfig;
 
+    private static final String LOGTAG = LogUtils.getTag(AudioRecorder.class.getSimpleName());
 
-    Button m_btnRecord;
+
+  
     Button m_btnPlay;
     Button m_btnStop;
     Button m_btnRecordMsg;
@@ -52,54 +62,17 @@ public class AudioMessageTransfer extends RcsActivity {
     boolean m_BoolRecording = false;
     boolean m_BoolPlaying = false;
     RcsActivity m_app;
-    Observer m_obs;
-    private final Handler mHandler = new Handler();
 
-    private FileTransfer mFileTransfer;
 
-    private FileTransferDAO mFtDao;
-
-    private boolean mGroupFileTransfer = false;
-
-    private String mTransferId;
-
-    private Button mPauseBtn;
-
-    private Button mResumeBtn;
-
-    private DialogInterface.OnClickListener mDeclineBtnListener;
-
-    private DialogInterface.OnClickListener mAcceptBtnListener;
-
-    private android.view.View.OnClickListener mBtnPauseListener;
-
-    private android.view.View.OnClickListener mBtnResumeListener;
-
-    private OneToOneFileTransferListener mFileTransferListener;
-
-    private GroupFileTransferListener mGroupFtListener;
-
-    private FileTransferService mFileTransferService;
-
-    private ProgressBar mProgressBar;
-
-    private static final String LOGTAG = LogUtils.getTag(ReceiveFileTransfer.class.getSimpleName());
-
-    private static final String VCARD_MIME_TYPE = "text/x-vcard";
-
-    private static final String BUNDLE_FTDAO_ID = "ftdao";
-
-    final static  RCSMediaPlayer player = new RCSMediaPlayer();
-    static   RCSRecorder record ;
+     static  AudioMediaPlayer mplayer;
+    static   AudioRecorder mrecord ;
 
 
 
     private void initialize()
     {
 
-
         setContentView(R.layout.audio_msg_transfer_initiate);
-        Log.w("RCS", "Path " + Environment.getExternalStorageDirectory().getAbsolutePath());
         m_btnPlay = (Button) findViewById(R.id.buttonPlay);
         m_btnStop = (Button) findViewById(R.id.buttonStop);
         m_btnSelFile =(Button)findViewById(R.id.select_btn);
@@ -113,14 +86,29 @@ public class AudioMessageTransfer extends RcsActivity {
 
         try {
             mConfig = getFileTransferApi().getConfiguration();
-            record = new RCSRecorder(mConfig.getMaxAudioMessageDuration());
+            AudioRecorder.INotifyMaxDurationReached notifyMaxDurationReached = new  AudioRecorder.INotifyMaxDurationReached() {
 
+                @Override
+                public void maxDurationReached() {
+                    m_btnStop.setEnabled(true);
+                    m_btnRecordMsg.setEnabled(true);
+                    m_btnPlay.setEnabled(true);
+                    Toast.makeText(getApplicationContext(), "End of Duration ", Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void NotifyDuration(int min, int sec) {
+                    m_EditDuration.setText("Duration : " +min+ "mins" + sec + "secs");
+
+                }
+            };
+            mrecord = new AudioRecorder(mConfig.getMaxAudioMessageDuration(), notifyMaxDurationReached);
+            mplayer = new AudioMediaPlayer(notifyMaxDurationReached);
         } catch (RcsServiceException e) {
             showExceptionThenExit(e);
             return;
         }
-        m_obs=new Observer(this,player,record);
-        startMonitorServices(ConnectionManager.RcsServiceName.FILE_TRANSFER);
+         startMonitorServices(ConnectionManager.RcsServiceName.FILE_TRANSFER);
         /**Register to API manager*/
         if (!isServiceConnected(ConnectionManager.RcsServiceName.FILE_TRANSFER)) {
             showMessageThenExit(R.string.label_service_not_available);
@@ -136,7 +124,7 @@ public class AudioMessageTransfer extends RcsActivity {
         setContentView(R.layout.audio_msg_transfer_initiate);
 
         initialize();
-        m_app=this;
+        m_app = this;
 
         m_btnRecordMsg.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,7 +134,7 @@ public class AudioMessageTransfer extends RcsActivity {
                     m_btnStop.setEnabled(true);
                     m_btnPlay.setEnabled(false);
                     m_btnRecordMsg.setEnabled(false);
-                    record.launchRecord();
+                    mrecord.launchRecord();
                     m_BoolRecording = true;
                     m_BoolPlaying = false;
                 } catch (Exception e) {
@@ -163,15 +151,25 @@ public class AudioMessageTransfer extends RcsActivity {
             @Override
             public void onClick(View v) {
                 if (m_BoolRecording) {
-                    record.stopRecord();
-                    player.play(record.getOutputFile(), false);
+                    mrecord.stopRecord();
+                    try {
+                        mplayer.play(mrecord.getOutputFile(), false);
+
+                    }catch (IOException e)
+                    {
+                          e.printStackTrace();
+
+                    }
                     m_BoolRecording = false;
-                    m_EditURI.setText(record.getOutputFile());
-                    Log.v("RCS FIle Rcorded",record.getOutputFile());
+                    m_EditURI.setText(mrecord.getOutputFile());
+
+                    if (LogUtils.isActive) {
+                        Log.w(LOGTAG, "RCS FIle Recorded" + mrecord.getOutputFile());
+                    }
                     Toast.makeText(getApplicationContext(), "Audio recorded successfully", Toast.LENGTH_LONG).show();
                 }
                 if (m_BoolPlaying) {
-                    player.stopPlay();
+                    mplayer.stopPlay();
                     m_BoolPlaying = false;
                     m_EditDuration.setText(" ");
                 }
@@ -193,7 +191,7 @@ public class AudioMessageTransfer extends RcsActivity {
                     public void fileSelected(File file) {
                         Log.d(getClass().getName(), "selected file " + file.toString());
                         m_EditURI.setText(file.toString());
-                        m_EditFileSize.setText(file.length()/1024 + "kbytes");
+                        m_EditFileSize.setText(file.length() / 1024 + "kbytes");
 
                     }
                 });
@@ -206,48 +204,34 @@ public class AudioMessageTransfer extends RcsActivity {
         });
 
 
-
         m_btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (m_BoolPlaying) {
-                    player.stopPlay();
+                    mplayer.stopPlay();
                     m_BoolPlaying = false;
                 }
                 try {
-                    player.play((String) m_EditURI.getText(), true);
+                    mplayer.play((String) m_EditURI.getText(), true);
                     m_BoolPlaying = true;
                     //TODO Display duration
                     m_btnRecordMsg.setEnabled(false);
                     m_btnStop.setEnabled(true);
                     m_btnPlay.setEnabled(true);
 
-                        } catch (Exception e) {
-                        }
-                    }
-                });
-
-   }
-
-    public  void setDuration(int min, int sec)
-    {
-        m_EditDuration.setText("Duration : " +min+ "mins" + sec + "secs");
-
-    }
-    public void endRecordingDuration() {
-        m_btnStop.setEnabled(true);
-        m_btnRecordMsg.setEnabled(true);
-        m_btnPlay.setEnabled(true);
-        Toast.makeText(getApplicationContext(), "End of Duration ", Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                }
+            }
+        });
 
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        player.release();
-        record.release();
-        m_obs.detach();
+        mplayer.release();
+        mrecord.release();
+
 
     }
     @Override

@@ -195,6 +195,7 @@
     <string name="label_no_subject">no subject</string>
     <string name="label_no_contact">&#8230;</string>
     <string name="label_ft_thumb">Thumbnail</string>
+    <string name="label_send_audio_msg">Audio message selected</string>
     <string name="menu_send_file">Send file</string>
     <string name="label_geoloc_msg">Geoloc</string>
     <string name="label_gc_from_subject">From: %1$s\nSubject: %2$s</string>

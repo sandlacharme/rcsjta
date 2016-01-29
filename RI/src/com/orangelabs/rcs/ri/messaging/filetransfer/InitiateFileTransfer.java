@@ -80,6 +80,7 @@ public class InitiateFileTransfer extends RcsActivity {
     private final static int SELECT_IMAGE = 0;
 
     private final static int SELECT_TEXT_FILE = 1;
+    private final static int SELECT_AUDIO = 2;
 
     private static final String BUNDLE_FTDAO_ID = "ftdao";
 
@@ -127,6 +128,13 @@ public class InitiateFileTransfer extends RcsActivity {
     private OnClickListener mBtnResumeListener;
 
     private FileTransferService mFileTransferService;
+
+    private void initialize()
+    {
+
+
+
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -240,6 +248,7 @@ public class InitiateFileTransfer extends RcsActivity {
         CheckBox ftThumb = (CheckBox) findViewById(R.id.ft_thumb);
         boolean tryToSendFileicon = ftThumb.isChecked();
         String mimeType = getContentResolver().getType(mFile);
+
         if (tryToSendFileicon && mimeType != null && !mimeType.startsWith("image")) {
             tryToSendFileicon = false;
         }
@@ -283,11 +292,18 @@ public class InitiateFileTransfer extends RcsActivity {
             public void onClick(DialogInterface dialog, int which) {
                 if (which == SELECT_IMAGE) {
                     FileUtils.openFile(InitiateFileTransfer.this, "image/*", SELECT_IMAGE);
-                } else {
+                }
+                if (which == SELECT_TEXT_FILE){
                     FileUtils.openFile(InitiateFileTransfer.this, "text/plain", SELECT_TEXT_FILE);
+                }
+                else
+                {
+                    FileUtils.openFile(InitiateFileTransfer.this, "audio", SELECT_AUDIO);
+
                 }
             }
         });
+
         registerDialog(builder.show());
     }
 

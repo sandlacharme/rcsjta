@@ -19,7 +19,7 @@
 package com.orangelabs.rcs.ri.messaging.filetransfer;
 
 import com.orangelabs.rcs.ri.R;
-import com.orangelabs.rcs.ri.messaging.filetransfer.multi.AudioMessageTransfer;
+import com.orangelabs.rcs.ri.messaging.filetransfer.AudioMessageTransfer;
 
 import android.app.ListActivity;
 import android.content.Intent;
