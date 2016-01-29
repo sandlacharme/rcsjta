@@ -9,15 +9,15 @@ public class Observer {
 
 
     AudioMessageTransfer sujetActivity;
-    RCSMediaPlayer play;
-    RCSRecorder recorder;
+    RCSMediaPlayer m_play;
+    RCSRecorder m_recorder;
 
     public Observer(AudioMessageTransfer a, RCSMediaPlayer pl, RCSRecorder rec)
     {
         sujetActivity=a;
-        recorder=rec;
+        m_recorder=rec;
         rec.setObserver(this);
-        play=pl;
+        m_play=pl;
         pl.setObserver(this);
 
     }
@@ -26,13 +26,13 @@ public class Observer {
     public void detach()
     {
         sujetActivity=null;
-        recorder=null;
-        play=null;
+        m_recorder=null;
+        m_play=null;
     }
 
-    public void NotifyDuration(int min, int sec)
+    public void NotifyDuration()
     {
-        sujetActivity.setDuration(play.getMin(),play.getSec());
+        sujetActivity.setDuration(m_play.getMin(),m_play.getSec());
     }
     public void NotifyEndDuration()
     {

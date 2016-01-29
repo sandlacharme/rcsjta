@@ -76,7 +76,7 @@ public class RCSMediaPlayer extends MediaPlayer {
                         if(duration>0) {
                             m_min = (int) ((duration / 1000) / 60) % 60;
                             m_sec = (int) ((duration /1000 ) % 60);
-                            m_obs.NotifyDuration(m_min, m_sec);
+                            m_obs.NotifyDuration();
                         }
                     if(!m_bPlay) {
                         mp.reset();m_bReset=true;

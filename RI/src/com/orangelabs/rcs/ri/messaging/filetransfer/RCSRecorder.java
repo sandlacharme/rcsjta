@@ -12,24 +12,23 @@ public class RCSRecorder extends MediaRecorder {
     //
     private final long MAX_AUDIO_DURATION;//6sec
     public  Observer m_obs;
+
+
     public String getOutputFile() {
-        return outputFile;
+        return m_outputfile;
     }
 
-    @Override
-    public void setOutputFile(String outputFile) {
-        this.outputFile = outputFile;
-    }
 
-    private String outputFile = null;
-     MediaRecorder currentRecord = null;
+
+    private String m_outputfile = null;
+    MediaRecorder m_currentRecord = null;
 
 
     public RCSRecorder(long m_lmax_audio_duration)
     {
         MAX_AUDIO_DURATION=m_lmax_audio_duration;
-        currentRecord=new MediaRecorder();
-       // currentRecord.reset();
+        m_currentRecord=new MediaRecorder();
+       // m_currentRecord.reset();
 
     }
 
@@ -42,14 +41,24 @@ public class RCSRecorder extends MediaRecorder {
     {
 
         //recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        //currentRecord.setAudioEncoder(MediaRecorder.getAudioSourceMax());
-        currentRecord.setAudioSource(AudioSource.VOICE_COMMUNICATION);
-        currentRecord.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        currentRecord.setAudioEncoder(AudioEncoder.DEFAULT);
+        //m_currentRecord.setAudioEncoder(MediaRecorder.getAudioSourceMax());
+        try
+        {
+            m_currentRecord.setAudioSource(AudioSource.VOICE_COMMUNICATION);
+            m_currentRecord.setOutputFormat(OutputFormat.DEFAULT);
+            m_currentRecord.setAudioEncoder(AudioEncoder.DEFAULT);
+        }
+        catch(IllegalStateException e){
+            e.printStackTrace();
+
+    }
+
+
+
+
         randomFilename();
-        currentRecord.setOutputFile(outputFile);
-        currentRecord.setMaxDuration((int)MAX_AUDIO_DURATION); // 10 seconds
-        currentRecord.setOnInfoListener(new OnInfoListener() {
+        m_currentRecord.setMaxDuration((int)MAX_AUDIO_DURATION); // 10 seconds
+        m_currentRecord.setOnInfoListener(new OnInfoListener() {
             @Override
             public void onInfo(MediaRecorder mr, int what, int extra) {
                 if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
@@ -68,11 +77,10 @@ public class RCSRecorder extends MediaRecorder {
         try {
 
             init();
-            currentRecord.prepare();
-            currentRecord.start();
+            m_currentRecord.prepare();
+            m_currentRecord.start();
 
         }
-
         catch (IllegalStateException e) {
         // TODO Auto-generated catch block
             e.printStackTrace();
@@ -87,8 +95,8 @@ public class RCSRecorder extends MediaRecorder {
 
     public void stopRecord() {
         try {
-            currentRecord.stop();
-            currentRecord.reset();
+            m_currentRecord.stop();
+            m_currentRecord.reset();
         } catch (RuntimeException e) {
 
         }
@@ -99,7 +107,7 @@ public class RCSRecorder extends MediaRecorder {
     /**
      * Generate a random Filename for audiofiles
      */
-    public void randomFilename() {
+    private void randomFilename() {
 
         int lower = 1;
         int higher = 10000;
@@ -110,8 +118,8 @@ public class RCSRecorder extends MediaRecorder {
             f.mkdir();
 
         }
-        outputFile= Environment.getExternalStorageDirectory().getAbsolutePath() + "/audiorecords/recording"+random+".3gp";
-        Log.w(" File path and name ", outputFile);
+        m_outputfile= "/sdcard/audiorecords/"+"recording"+random+".3gp";
+        Log.w(" File path and name ", m_outputfile);
     }
 
     public final long getMaxAudioDuration()

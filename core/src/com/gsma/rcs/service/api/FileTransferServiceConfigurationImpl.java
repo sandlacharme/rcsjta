@@ -212,7 +212,7 @@ public class FileTransferServiceConfigurationImpl extends IFileTransferServiceCo
     @Override
     public long getMaxAudioMessageDuration() throws RemoteException {
         try {
-            //TODO
+
             return mRcsSettings.getMaxAudioMessageDuration();
 
         } catch (ServerApiBaseException e) {
