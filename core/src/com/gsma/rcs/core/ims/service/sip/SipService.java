@@ -88,7 +88,7 @@ public class SipService extends ImsService {
 
     private final RcsSettings mRcsSettings;
 
-    private final ImmManager mImmManager;
+    private ImmManager mImmManager;
 
     private MultimediaSessionServiceImpl mMmSessionService;
 
@@ -150,6 +150,8 @@ public class SipService extends ImsService {
             return;
         }
         setServiceStarted(true);
+        // TODO do not commit : just for bug fix
+        mImmManager = new ImmManager(this, mRcsSettings);
         mImmManager.start();
     }
 

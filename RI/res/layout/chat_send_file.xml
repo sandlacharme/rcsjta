@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:fillViewport="false">
 
     <TableLayout
         android:layout_width="fill_parent"
@@ -26,6 +27,20 @@
 
             <TextView
                 android:id="@+id/uri"
+                android:layout_marginLeft="5dip"
+                android:layout_marginRight="5dip"
+                android:singleLine="true"
+                android:textStyle="bold" />
+        </TableRow>
+        <TableRow android:paddingTop="5dip" >
+
+            <TextView
+                android:layout_marginLeft="5dip"
+                android:gravity="right"
+                android:text="@string/label_size" />
+
+            <TextView
+                android:id="@+id/size"
                 android:layout_marginLeft="5dip"
                 android:layout_marginRight="5dip"
                 android:singleLine="true"
@@ -62,11 +77,22 @@
                 android:gravity="left" />
         </TableRow>
 
+         <CheckBox
+                android:id="@+id/send_audio_msg"
+                android:enabled="true"
+                android:text="@string/label_send_audio_msg" />
+
+
         <Button
             android:id="@+id/select_btn"
             android:layout_marginLeft="5dip"
             android:layout_marginRight="5dip"
             android:text="@string/label_select_file" />
+        <Button
+            android:id="@+id/selectAudio_btn"
+            android:layout_marginLeft="5dip"
+            android:layout_marginRight="5dip"
+            android:text="@string/label_select_audio_file" />
 
         <Button
             android:id="@+id/invite_btn"

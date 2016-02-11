@@ -51,6 +51,7 @@
     <string name="label_receive_image">Received image %s</string>
     <string name="label_remote">Remote contact:</string>
     <string name="label_select_file">Select file</string>
+    <string name="label_select_audio_file">Select audio file</string>
     <string name="label_invalid_contacts">Invalid list of participants</string>
     <string name="label_uninitialized_contact">+33XXXXXXX</string>
     <string name="label_uninitialized_text">blah, blah, blah</string>

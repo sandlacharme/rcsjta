@@ -76,7 +76,7 @@ public class SendSingleFile extends SendFile {
     }
 
     @Override
-    public boolean transferFile(Uri file, boolean fileicon) {
+    public boolean transferFile(Uri file,FileTransfer.Disposition dispo, boolean fileicon) {
         try {
             if (LogUtils.isActive) {
                 Log.d(LOGTAG, "initiateTransfer mFilename=" + mFilename + " size=" + mFilesize);
@@ -85,8 +85,7 @@ public class SendSingleFile extends SendFile {
             takePersistableContentUriPermission(this, file);
             /* Initiate transfer */
             // TODO SL
-            mFileTransfer = mFileTransferService.transferFile(mContact, file,
-                    FileTransfer.Disposition.RENDER, fileicon);
+            mFileTransfer = mFileTransferService.transferFile(mContact, file, dispo, fileicon);
             mTransferId = mFileTransfer.getTransferId();
             return true;
 
