@@ -162,7 +162,6 @@ public class InitiateFileTransfer extends RcsActivity {
                             remoteContact.toString()
                         });
                 mSpinner.setAdapter(adapter);
-
                 mSizeTextView.setText(FileUtils.humanReadableByteCount(mFilesize, true));
                 mUriTextView.setText(mFilename);
                 /* Check if session still exists */
@@ -261,8 +260,7 @@ public class InitiateFileTransfer extends RcsActivity {
                     return;
                 }
                 if (RC_SELECT_TEXT_FILE == which) {
-                    FileUtils
-                            .openFile(InitiateFileTransfer.this, "text/plain", RC_SELECT_TEXT_FILE);
+                    FileUtils.openFile(InitiateFileTransfer.this, "text/plain", RC_SELECT_TEXT_FILE);
                     return;
                 }
                 FileUtils.openFile(InitiateFileTransfer.this, "audio/*", RC_SELECT_AUDIO);

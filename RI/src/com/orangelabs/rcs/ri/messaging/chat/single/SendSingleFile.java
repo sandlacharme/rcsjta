@@ -84,7 +84,6 @@ public class SendSingleFile extends SendFile {
             /* Only take persistable permission for content Uris */
             takePersistableContentUriPermission(this, file);
             /* Initiate transfer */
-            // TODO SL
             mFileTransfer = mFileTransferService.transferFile(mContact, file, dispo, fileicon);
             mTransferId = mFileTransfer.getTransferId();
             return true;

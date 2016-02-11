@@ -48,7 +48,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ProgressBar;
@@ -62,8 +61,8 @@ import android.widget.Toast;
  */
 public abstract class SendFile extends RcsActivity implements ISendFile {
 
-    private final static int SELECT_IMAGE = 0;
-    private final static int SELECT_AUDIO=1;
+    private final static int RC_SELECT_IMAGE = 0;
+    private final static int RC_SELECT_AUDIO=1;
 
     /**
      * UI handler
@@ -92,14 +91,13 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
     private Button mInviteBtn;
 
     private Button mSelectBtn;
-    private Button mSelectAudioBtn;
 
     protected FileTransferService mFileTransferService;
 
     private OnClickListener mBtnInviteListener;
 
     private OnClickListener mBtnSelectListener;
-    private OnClickListener mBtnSelectAudioListener;
+
 
     private OnClickListener mBtnPauseListener;
 
@@ -122,9 +120,6 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
 
         mSelectBtn = (Button) findViewById(R.id.select_btn);
         mSelectBtn.setOnClickListener(mBtnSelectListener);
-
-        mSelectAudioBtn = (Button)findViewById(R.id.selectAudio_btn);
-        mSelectAudioBtn.setOnClickListener(mBtnSelectAudioListener);
 
         mPauseBtn = (Button) findViewById(R.id.pause_btn);
         mPauseBtn.setOnClickListener(mBtnPauseListener);
@@ -165,12 +160,10 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
     }
 
     private void initiateTransfer() {
-        FileTransfer.Disposition dispo;
-        /* Get thumbnail option */
+         /* Get thumbnail option */
         CheckBox ftThumb = (CheckBox) findViewById(R.id.ft_thumb);
         CheckBox ftAudio = (CheckBox) findViewById(R.id.send_audio_msg);
         boolean audioIsChecked = ftAudio.isChecked();
-        //transferFile(mFile,dispo ,ftThumb.isChecked()
          if (transferFile(mFile,mDispo,(ftThumb.isChecked()&& !audioIsChecked))) {
             /* Display a progress dialog */
             mProgressDialog = showProgressDialog(getString(R.string.label_command_in_progress));
@@ -184,7 +177,6 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
             /* Hide buttons */
             mInviteBtn.setVisibility(View.INVISIBLE);
             mSelectBtn.setVisibility(View.INVISIBLE);
-            mSelectAudioBtn.setVisibility(View.INVISIBLE);
             ftThumb.setVisibility(View.INVISIBLE);
         }
     }
@@ -197,7 +189,7 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
         CheckBox checkAudio = (CheckBox)findViewById(R.id.send_audio_msg);
         checkAudio.setChecked(true);
         switch (requestCode) {
-            case SELECT_IMAGE:
+            case RC_SELECT_IMAGE:
                 if ((data != null) && (data.getData() != null)) {
                     /* Get selected photo URI */
                     displayFileInfo(data);
@@ -205,7 +197,7 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
                     checkAudio.setChecked(false);
                 }
                 break;
-            case SELECT_AUDIO :
+            case RC_SELECT_AUDIO :
                 if ((data != null) && (data.getData() != null)) {
                     /* Get selected audio URI */
                    displayFileInfo(data);
@@ -214,6 +206,27 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
                 }
                 break;
         }
+    }
+    /**
+     * Display a alert dialog to select the kind of file to transfer
+     */
+    private void selectDocument() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.label_select_file);
+        builder.setCancelable(true);
+        builder.setItems(R.array.select_filetotransfer, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (RC_SELECT_IMAGE == which) {
+                    FileUtils.openFile(SendFile.this, "image/*", RC_SELECT_IMAGE);
+                    return;
+                }
+                FileUtils.openFile(SendFile.this, "audio/*", RC_SELECT_AUDIO);
+            }
+        });
+
+        registerDialog(builder.show());
     }
 
     private void displayFileInfo(Intent data)
@@ -225,7 +238,7 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
         TextView sizeEdit = (TextView) findViewById(R.id.size);
         mFilename = FileUtils.getFileName(this, mFile);
         mFilesize = FileUtils.getFileSize(this, mFile) / 1024;
-        sizeEdit.setText(mFilesize + " KB");
+        sizeEdit.setText(FileUtils.humanReadableByteCount(mFilesize, true).concat("Kb"));
         uriEdit.setText(mFilename);
         mInviteBtn.setEnabled(true);
 
@@ -354,14 +367,11 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
 
         mBtnSelectListener = new OnClickListener() {
             public void onClick(View v) {
-                FileUtils.openFile(SendFile.this, "image/*", SELECT_IMAGE);
-            }
-        };
+                /**
+                 * Display a alert dialog to select the kind of file to transfer
+                 */
 
-
-        mBtnSelectAudioListener = new OnClickListener() {
-            public void onClick(View v) {
-                FileUtils.openFile(SendFile.this, "audio/*", SELECT_AUDIO);
+                selectDocument();
             }
         };
 

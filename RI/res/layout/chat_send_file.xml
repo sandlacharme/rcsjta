@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:fillViewport="false">
+    android:layout_height="fill_parent">
 
     <TableLayout
         android:layout_width="fill_parent"
@@ -88,11 +87,6 @@
             android:layout_marginLeft="5dip"
             android:layout_marginRight="5dip"
             android:text="@string/label_select_file" />
-        <Button
-            android:id="@+id/selectAudio_btn"
-            android:layout_marginLeft="5dip"
-            android:layout_marginRight="5dip"
-            android:text="@string/label_select_audio_file" />
 
         <Button
             android:id="@+id/invite_btn"
