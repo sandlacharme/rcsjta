@@ -50,7 +50,6 @@ public class SendMultiFileGroupChat extends SendMultiFile implements ISendMultiF
         try {
             for (FileTransferProperties fileToTransfer : filesToTransfer) {
                 /* Initiate transfer */
-                // TODO SL
                 FileTransfer fileTransfer = mFileTransferService.transferFileToGroupChat(mChatId,
                         fileToTransfer.getUri(),
                         fileToTransfer.getDisposition(),

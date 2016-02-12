@@ -103,6 +103,9 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
 
     private OnClickListener mBtnResumeListener;
 
+    private CheckBox mCheckThumNail ;
+    private CheckBox mCheckAudio;
+
     private static final String LOGTAG = LogUtils.getTag(SendFile.class.getSimpleName());
 
     @Override
@@ -128,6 +131,13 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
         mResumeBtn = (Button) findViewById(R.id.resume_btn);
         mResumeBtn.setOnClickListener(mBtnResumeListener);
         mResumeBtn.setEnabled(false);
+
+        mCheckThumNail = (CheckBox)findViewById(R.id.file_thumb);
+        mCheckThumNail.setVisibility(View.INVISIBLE);
+
+        mCheckAudio = (CheckBox)findViewById(R.id.send_audio_msg);
+        mCheckAudio.setVisibility(View.INVISIBLE);
+
 
         /* Register to API connection manager */
         if (!isServiceConnected(RcsServiceName.CHAT, RcsServiceName.FILE_TRANSFER,
@@ -161,26 +171,14 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
 
     private void initiateTransfer() {
          /* Get thumbnail option */
-        CheckBox ftThumb = (CheckBox) findViewById(R.id.ft_thumb);
         CheckBox ftAudio = (CheckBox) findViewById(R.id.send_audio_msg);
         boolean audioIsChecked = ftAudio.isChecked();
-        transferFile(mFile,mDispo,(ftThumb.isChecked()&& !audioIsChecked));
+        transferFile(mFile, mDispo, (mCheckThumNail.isChecked() && !audioIsChecked));
+        /* Hide buttons */
+        mInviteBtn.setVisibility(View.INVISIBLE);
+        mSelectBtn.setVisibility(View.INVISIBLE);
+        mCheckThumNail.setVisibility(View.INVISIBLE);
 
-            //if (transferFile(mFile,mDispo,(ftThumb.isChecked()&& !audioIsChecked))) {
-            /* Display a progress dialog
-            mProgressDialog = showProgressDialog(getString(R.string.label_command_in_progress));
-            mProgressDialog.setOnCancelListener(new OnCancelListener() {
-                public void onCancel(DialogInterface dialog) {
-                    Toast.makeText(SendFile.this, getString(R.string.label_transfer_cancelled),
-                            Toast.LENGTH_SHORT).show();
-                    quitSession();
-                }
-            });
-            /* Hide buttons */
-            mInviteBtn.setVisibility(View.INVISIBLE);
-            mSelectBtn.setVisibility(View.INVISIBLE);
-            ftThumb.setVisibility(View.INVISIBLE);
-        //}
     }
 
     @Override
@@ -188,23 +186,28 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
         if (resultCode != RESULT_OK) {
             return;
         }
-        CheckBox checkAudio = (CheckBox)findViewById(R.id.send_audio_msg);
-        checkAudio.setChecked(true);
+       if(mCheckAudio.isChecked()) mCheckAudio.setChecked(false);
+       if(mCheckThumNail.isChecked()) mCheckThumNail.setChecked(false);
+
         switch (requestCode) {
             case RC_SELECT_IMAGE:
                 if ((data != null) && (data.getData() != null)) {
                     /* Get selected photo URI */
                     displayFileInfo(data);
                     mDispo = FileTransfer.Disposition.ATTACH;
-                    checkAudio.setChecked(false);
+                    mCheckThumNail.setChecked(true);
+                    mCheckAudio.setVisibility(View.INVISIBLE);
+
                 }
                 break;
             case RC_SELECT_AUDIO :
                 if ((data != null) && (data.getData() != null)) {
                     /* Get selected audio URI */
                    displayFileInfo(data);
+                    mCheckAudio.setChecked(true);
                     mDispo = FileTransfer.Disposition.RENDER;
-                    checkAudio.setChecked(true);
+                    mCheckThumNail.setVisibility(View.INVISIBLE);
+
                 }
                 break;
         }

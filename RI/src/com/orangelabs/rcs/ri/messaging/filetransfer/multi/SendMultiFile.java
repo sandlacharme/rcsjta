@@ -415,6 +415,7 @@ public abstract class SendMultiFile extends RcsActivity implements ISendMultiFil
             TableRow mReasonCodeTableRow;
             TextView mReasonCodeText;
             CheckBox mFileIcon;
+            CheckBox mAudiomsg;
             ProgressBar mProgressBar;
 
             ViewHolder(View view) {
@@ -425,6 +426,7 @@ public abstract class SendMultiFile extends RcsActivity implements ISendMultiFil
                 mProgressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
                 mReasonCodeTableRow = (TableRow) view.findViewById(R.id.row_reason_code);
                 mReasonCodeText = (TextView) view.findViewById(R.id.text_reason_code);
+                mAudiomsg =(CheckBox)view.findViewById(R.id.send_audio_msg);
             }
         }
 
@@ -443,14 +445,24 @@ public abstract class SendMultiFile extends RcsActivity implements ISendMultiFil
             final FileTransferProperties item = mFileTransferViewItems[position];
             viewHolder.mUri.setText(item.getFilename());
             viewHolder.mSize.setText(String.valueOf(item.getSize()).concat(" KB"));
-            viewHolder.mProgressStatus.setText(item.getStatus());
-            viewHolder.mFileIcon.setChecked(item.isFileicon());
-            viewHolder.mFileIcon.setOnClickListener(new View.OnClickListener() {
+
+            if(item.getDisposition().equals(FileTransfer.Disposition.RENDER))
+            {
+                viewHolder.mFileIcon.setVisibility(View.INVISIBLE);
+                viewHolder.mAudiomsg.setEnabled(true);
+
+            }
+            else
+            {
+                viewHolder.mAudiomsg.setVisibility(View.INVISIBLE);
+                viewHolder.mFileIcon.setEnabled(true);
+                viewHolder.mFileIcon.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     CheckBox cb = (CheckBox) v;
                     item.setFileicon(cb.isChecked());
-                }
-            });
+                    }
+                });
+            }
             viewHolder.mProgressBar.setProgress(item.getProgress());
             if (item.getReasonCode() == null) {
                 viewHolder.mReasonCodeTableRow.setVisibility(View.GONE);

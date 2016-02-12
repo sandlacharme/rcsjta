@@ -11,11 +11,12 @@
 
         <TableRow android:paddingTop="5dip" >
 
-            <CheckBox
+         <CheckBox
                 android:id="@+id/ft_thumb"
                 android:enabled="true"
                 android:text="@string/label_ft_thumb" />
         </TableRow>
+
 
         <TableRow android:paddingTop="5dip" >
 
@@ -93,6 +94,16 @@
                 android:singleLine="true"
                 android:textStyle="bold" />
         </TableRow>
+
+
+        <TableRow>
+            <CheckBox
+            android:id="@+id/send_audio_msg"
+            android:enabled="false"
+            android:text="@string/label_send_audio_msg" />
+        </TableRow>
+
+
     </TableLayout>
 
 </ScrollView>
