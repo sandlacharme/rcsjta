@@ -52,7 +52,8 @@ public class SendMultiFileGroupChat extends SendMultiFile implements ISendMultiF
                 /* Initiate transfer */
                 // TODO SL
                 FileTransfer fileTransfer = mFileTransferService.transferFileToGroupChat(mChatId,
-                        fileToTransfer.getUri(), FileTransfer.Disposition.ATTACH,
+                        fileToTransfer.getUri(),
+                        fileToTransfer.getDisposition(),
                         fileToTransfer.isFileicon());
                 String fileTransferId = fileTransfer.getTransferId();
                 mTransferIds.add(fileTransferId);
@@ -60,7 +61,7 @@ public class SendMultiFileGroupChat extends SendMultiFile implements ISendMultiF
                 if (LogUtils.isActive) {
                     Log.d(LOGTAG, "Transfer file '" + fileToTransfer.getFilename() + "' to chatId="
                             + mChatId + " icon=" + fileToTransfer.isFileicon() + " fileTransferId="
-                            + fileTransferId);
+                            + fileTransferId );
                 }
             }
             return true;

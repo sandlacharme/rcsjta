@@ -173,6 +173,8 @@ public abstract class SendMultiFile extends RcsActivity implements ISendMultiFil
     private boolean parseIntent(Intent intent) {
         mChatId = intent.getStringExtra(EXTRA_CHAT_ID);
         String action = intent.getAction();
+        FileTransfer.Disposition disposition ;
+
         // Here we get data from the event.
         if (Intent.ACTION_SEND.equals(action)) {
             mFiles = new ArrayList<>();
@@ -180,7 +182,19 @@ public abstract class SendMultiFile extends RcsActivity implements ISendMultiFil
             Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
             String fileName = FileUtils.getFileName(this, uri);
             long fileSize = FileUtils.getFileSize(this, uri) / 1024;
-            mFiles.add(new FileTransferProperties(uri, fileName, fileSize));
+
+
+            if(intent.getType().contains("audio/"))
+            {
+
+               disposition=FileTransfer.Disposition.RENDER;
+            }
+            else
+            {
+                disposition=FileTransfer.Disposition.ATTACH;
+            }
+
+            mFiles.add(new FileTransferProperties(uri, fileName, fileSize,disposition ));
             if (LogUtils.isActive) {
                 Log.d(LOGTAG, "Transfer single file " + fileName + " (size=" + fileSize + ")");
             }
@@ -196,7 +210,10 @@ public abstract class SendMultiFile extends RcsActivity implements ISendMultiFil
                 for (Uri uri : uris) {
                     String fileName = FileUtils.getFileName(this, uri);
                     long fileSize = FileUtils.getFileSize(this, uri) / 1024;
-                    mFiles.add(new FileTransferProperties(uri, fileName, fileSize));
+                    if(intent.getType().contains("audio/")) {
+                        mFiles.add(new FileTransferProperties(uri, fileName, fileSize, FileTransfer.Disposition.RENDER));
+                    }
+                    else  mFiles.add(new FileTransferProperties(uri, fileName, fileSize, FileTransfer.Disposition.ATTACH));
                     files.append(loopDelim);
                     files.append(fileName);
                     files.append("(");

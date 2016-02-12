@@ -338,7 +338,10 @@ public class FileTransferDAO implements Parcelable {
      * Gets instance of File Transfer from RCS provider
      * 
      * @param context the context
-     * @param fileTransferId the file transfer ID
+     * @param fileTransferId the file tr
+     *
+     *
+     *                       ansfer ID
      * @return instance or null if entry not found
      */
     public static FileTransferDAO getFileTransferDAO(final Context context,

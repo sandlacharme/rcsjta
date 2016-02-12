@@ -164,8 +164,10 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
         CheckBox ftThumb = (CheckBox) findViewById(R.id.ft_thumb);
         CheckBox ftAudio = (CheckBox) findViewById(R.id.send_audio_msg);
         boolean audioIsChecked = ftAudio.isChecked();
-         if (transferFile(mFile,mDispo,(ftThumb.isChecked()&& !audioIsChecked))) {
-            /* Display a progress dialog */
+        transferFile(mFile,mDispo,(ftThumb.isChecked()&& !audioIsChecked));
+
+            //if (transferFile(mFile,mDispo,(ftThumb.isChecked()&& !audioIsChecked))) {
+            /* Display a progress dialog
             mProgressDialog = showProgressDialog(getString(R.string.label_command_in_progress));
             mProgressDialog.setOnCancelListener(new OnCancelListener() {
                 public void onCancel(DialogInterface dialog) {
@@ -178,7 +180,7 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
             mInviteBtn.setVisibility(View.INVISIBLE);
             mSelectBtn.setVisibility(View.INVISIBLE);
             ftThumb.setVisibility(View.INVISIBLE);
-        }
+        //}
     }
 
     @Override

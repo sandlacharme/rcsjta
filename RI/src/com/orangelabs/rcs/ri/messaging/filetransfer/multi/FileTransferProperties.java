@@ -20,6 +20,8 @@ package com.orangelabs.rcs.ri.messaging.filetransfer.multi;
 
 import android.net.Uri;
 
+import com.gsma.services.rcs.filetransfer.FileTransfer;
+
 /**
  * FileTransferProperties
  */
@@ -33,6 +35,12 @@ public class FileTransferProperties {
     private int mProgress;
     private String mReasonCode;
 
+    public FileTransfer.Disposition getDisposition() {
+        return mDisposition;
+    }
+
+    private FileTransfer.Disposition mDisposition;
+
     /**
      * Default constructor
      * 
@@ -40,10 +48,11 @@ public class FileTransferProperties {
      * @param filename the file name
      * @param size the file size
      */
-    public FileTransferProperties(Uri uri, String filename, long size) {
+    public FileTransferProperties(Uri uri, String filename, long size ,FileTransfer.Disposition dispo ) {
         mUri = uri;
         mFilename = filename;
         mSize = size;
+        mDisposition=dispo;
     }
 
     /**
