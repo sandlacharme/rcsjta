@@ -302,11 +302,16 @@ public class InitiateFileTransfer extends RcsActivity {
                 displaySelectedFileInfo();
                 mInviteBtn.setEnabled(true);
                 if (RC_SELECT_AUDIO == requestCode) {
-                    mAudioMessageCheckBox.setEnabled(true);
+                    if(!mAudioMessageCheckBox.isEnabled()) mAudioMessageCheckBox.setEnabled(true);
+                     mAudioMessageCheckBox.setChecked(true);
+                    if(mIconCheckBox.isChecked()) mIconCheckBox.setChecked(false);
                     mIconCheckBox.setEnabled(false);
                 } else {
-                    mAudioMessageCheckBox.setEnabled(false);
-                    mIconCheckBox.setEnabled(true);
+                    if(mAudioMessageCheckBox.isChecked()) mAudioMessageCheckBox.setChecked(false);
+                        mAudioMessageCheckBox.setEnabled(false);
+                    if(!mIconCheckBox.isEnabled()) mIconCheckBox.setEnabled(true);
+                    mIconCheckBox.setChecked(true);
+
                 }
                 break;
 
@@ -318,8 +323,8 @@ public class InitiateFileTransfer extends RcsActivity {
                 }
                 displaySelectedFileInfo();
                 mInviteBtn.setEnabled(true);
-                mAudioMessageCheckBox.setEnabled(true);
-                mIconCheckBox.setEnabled(false);
+                mAudioMessageCheckBox.setChecked(true);
+                mIconCheckBox.setChecked(false);
                 break;
         }
     }

@@ -448,14 +448,17 @@ public abstract class SendMultiFile extends RcsActivity implements ISendMultiFil
 
             if(item.getDisposition().equals(FileTransfer.Disposition.RENDER))
             {
+                if(viewHolder.mFileIcon.isChecked()) viewHolder.mFileIcon.setChecked(false);
                 viewHolder.mFileIcon.setVisibility(View.INVISIBLE);
-                viewHolder.mAudiomsg.setEnabled(true);
-
+                if(!viewHolder.mAudiomsg.isEnabled()) viewHolder.mAudiomsg.setEnabled(true);
+                viewHolder.mAudiomsg.setChecked(true);
             }
             else
             {
+                if(viewHolder.mAudiomsg.isChecked()) viewHolder.mAudiomsg.setChecked(false);
                 viewHolder.mAudiomsg.setVisibility(View.INVISIBLE);
-                viewHolder.mFileIcon.setEnabled(true);
+                if(!viewHolder.mFileIcon.isEnabled()) viewHolder.mFileIcon.setEnabled(true);
+                viewHolder.mFileIcon.setChecked(true);
                 viewHolder.mFileIcon.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     CheckBox cb = (CheckBox) v;
@@ -486,9 +489,7 @@ public abstract class SendMultiFile extends RcsActivity implements ISendMultiFil
         }
     }
 
-    /**
-     * 
-     */
+
     protected void closeDialogIfMultipleFileTransferIsFinished() {
         if (mFileTransfers == null) {
             return;
