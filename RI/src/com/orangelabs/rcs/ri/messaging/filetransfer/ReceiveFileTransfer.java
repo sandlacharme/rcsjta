@@ -107,6 +107,8 @@ public class ReceiveFileTransfer extends RcsActivity {
 
     private static final String VCARD_MIME_TYPE = "text/x-vcard";
 
+    private static final String AUDIO_MIME_TYPE = "audio/*";
+
     private static final String BUNDLE_FTDAO_ID = "ftdao";
 
     @Override
@@ -231,7 +233,7 @@ public class ReceiveFileTransfer extends RcsActivity {
             FileTransfer.State state = mFileTransfer.getState();
             /* Check if not already accepted by the stack */
             if (FileTransfer.State.INVITED != state) {
-                /* File Transfer is auto accepted by the stack. Check capacity */
+                /* File Transfer is auto accepted  by the stack. Check capacity */
                 isCapacityOk(mFtDao.getSize());
 
                 if (FileTransfer.State.TRANSFERRED == state) {
@@ -285,7 +287,7 @@ public class ReceiveFileTransfer extends RcsActivity {
                         iconView.setImageResource(R.drawable.ri_contact_card_icon);
                     } else {
                         iconView.setImageResource(R.drawable.ri_notif_file_transfer_icon);
-                    }
+                }//TODO SL : AUDIO ICONE
                 }
                 builder.setPositiveButton(R.string.label_accept, mAcceptBtnListener);
                 builder.setNegativeButton(R.string.label_decline, mDeclineBtnListener);
@@ -550,7 +552,14 @@ public class ReceiveFileTransfer extends RcsActivity {
         } else {
             if (mFtDao.getMimeType().startsWith("image/")) {
                 /* Show the transferred image */
-                Utils.showPictureAndExit(this, mFtDao.getFile());
+                Utils.showDocumentAndExit(this, mFtDao.getFile(), "image/");
+            }
+            else
+            {
+                if(mFtDao.getMimeType().startsWith(AUDIO_MIME_TYPE)&&mFtDao.getDisposition()== FileTransfer.Disposition.RENDER)
+                {
+                    Utils.showDocumentAndExit(this,mFtDao.getFile(),"audio/*");
+                }
             }
         }
     }

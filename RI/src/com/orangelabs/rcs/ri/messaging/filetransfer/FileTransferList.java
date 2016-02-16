@@ -33,6 +33,7 @@ import com.orangelabs.rcs.ri.R;
 import com.orangelabs.rcs.ri.RiApplication;
 import com.orangelabs.rcs.ri.utils.LogUtils;
 import com.orangelabs.rcs.ri.utils.RcsContactUtil;
+import com.orangelabs.rcs.ri.utils.Utils;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -96,6 +97,7 @@ public class FileTransferList extends RcsFragmentActivity implements
      */
     private final static int MENU_ITEM_DELETE = 0;
     private final static int MENU_ITEM_RESEND = 1;
+    private final static int MENU_ITEM_DISPLAY=2;
 
     /**
      * The loader's unique ID. Loader IDs are specific to the Activity in which they reside.
@@ -299,16 +301,20 @@ public class FileTransferList extends RcsFragmentActivity implements
         String transferId = cursor.getString(cursor.getColumnIndexOrThrow(FileTransferLog.FT_ID));
         try {
             FileTransfer transfer = mFileTransferService.getFileTransfer(transferId);
+            if(transfer!=null)  menu.add(0,MENU_ITEM_DISPLAY,2,R.string.menu_display_content);
             if (transfer != null && transfer.isAllowedToResendTransfer()) {
                 menu.add(0, MENU_ITEM_RESEND, 1, R.string.menu_resend_message);
+
             }
         } catch (RcsServiceException e) {
             showExceptionThenExit(e);
         }
+
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        FileTransfer transfer;
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
         Cursor cursor = (Cursor) (mAdapter.getItem(info.position));
         String transferId = cursor.getString(cursor.getColumnIndexOrThrow(FileTransferLog.FT_ID));
@@ -322,7 +328,7 @@ public class FileTransferList extends RcsFragmentActivity implements
                         showMessage(R.string.label_service_not_available);
                         return true;
                     }
-                    FileTransfer transfer = mFileTransferService.getFileTransfer(transferId);
+                     transfer = mFileTransferService.getFileTransfer(transferId);
                     if (transfer != null) {
                         transfer.resendTransfer();
                     }
@@ -337,6 +343,10 @@ public class FileTransferList extends RcsFragmentActivity implements
                         return true;
                     }
                     mFileTransferService.deleteFileTransfer(transferId);
+                    return true;
+                case MENU_ITEM_DISPLAY :
+                    transfer = mFileTransferService.getFileTransfer(transferId);
+                    Utils.showDocumentAndExit(this,transfer.getFile(), transfer.getMimeType());
                     return true;
             }
         } catch (RcsServiceException e) {

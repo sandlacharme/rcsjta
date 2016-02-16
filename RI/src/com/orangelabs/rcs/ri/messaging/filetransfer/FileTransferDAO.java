@@ -83,6 +83,8 @@ public class FileTransferDAO implements Parcelable {
 
     private static ContentResolver sContentResolver;
 
+    private FileTransfer.Disposition mDisposition;
+
     private static final String LOGTAG = LogUtils.getTag(FileTransferDAO.class.getSimpleName());
 
     public FileTransfer.State getState() {
@@ -148,6 +150,11 @@ public class FileTransferDAO implements Parcelable {
     public Uri getThumbnail() {
         return mThumbnail;
     }
+
+    public FileTransfer.Disposition getDisposition() {
+        return mDisposition;
+    }
+
 
     /**
      * Returns the time when the file on the content server is no longer valid to download.
@@ -250,7 +257,11 @@ public class FileTransferDAO implements Parcelable {
                     .getColumnIndexOrThrow(FileTransferLog.TIMESTAMP_DISPLAYED));
             mSizeTransferred = cursor.getLong(cursor
                     .getColumnIndexOrThrow(FileTransferLog.TRANSFERRED));
-            mSize = cursor.getLong(cursor.getColumnIndexOrThrow(FileTransferLog.FILESIZE));
+            mSize = cursor.getLong(cursor
+                    .getColumnIndexOrThrow(FileTransferLog.FILESIZE));
+            int iDispo = Integer.parseInt(FileTransferLog.DISPOSITION);
+            if(iDispo ==1) mDisposition = FileTransfer.Disposition.RENDER;
+            else mDisposition = FileTransfer.Disposition.ATTACH;
             String fileicon = cursor.getString(cursor
                     .getColumnIndexOrThrow(FileTransferLog.FILEICON));
             if (fileicon != null) {

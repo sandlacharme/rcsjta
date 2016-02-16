@@ -49,6 +49,7 @@ import com.orangelabs.rcs.ri.messaging.geoloc.DisplayGeoloc;
 import com.orangelabs.rcs.ri.utils.LogUtils;
 import com.orangelabs.rcs.ri.utils.RcsContactUtil;
 import com.orangelabs.rcs.ri.utils.Smileys;
+import com.orangelabs.rcs.ri.utils.Utils;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -103,6 +104,7 @@ public class SingleChatView extends ChatView {
     private final static int MENU_ITEM_DELETE = 0;
 
     private final static int MENU_ITEM_RESEND = 1;
+    private final static int MENU_ITEM_DISPLAY=2;
 
     private static final String LOGTAG = LogUtils.getTag(SingleChatView.class.getSimpleName());
 
@@ -312,6 +314,7 @@ public class SingleChatView extends ChatView {
         Cursor cursor = (Cursor) mAdapter.getItem(info.position);
         // Adapt the contextual menu according to the selected item
         menu.add(0, MENU_ITEM_DELETE, MENU_ITEM_DELETE, R.string.menu_delete_message);
+        menu.add(0,MENU_ITEM_DISPLAY,MENU_ITEM_DISPLAY,"Display");
         Direction direction = Direction.valueOf(cursor.getInt(cursor
                 .getColumnIndexOrThrow(HistoryLog.DIRECTION)));
         if (Direction.OUTGOING != direction) {
@@ -337,6 +340,7 @@ public class SingleChatView extends ChatView {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        FileTransfer fileTransfer;
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
         Cursor cursor = (Cursor) (mAdapter.getItem(info.position));
         int providerId = cursor.getInt(cursor.getColumnIndexOrThrow(HistoryLog.PROVIDER_ID));
@@ -350,7 +354,7 @@ public class SingleChatView extends ChatView {
                     if (ChatLog.Message.HISTORYLOG_MEMBER_ID == providerId) {
                         mChat.resendMessage(messageId);
                     } else {
-                        FileTransfer fileTransfer = mFileTransferService.getFileTransfer(messageId);
+                         fileTransfer = mFileTransferService.getFileTransfer(messageId);
                         if (fileTransfer != null) {
                             fileTransfer.resendTransfer();
                         }
@@ -370,6 +374,16 @@ public class SingleChatView extends ChatView {
                 } catch (RcsServiceException e) {
                     showException(e);
                 }
+                return true;
+
+
+            case MENU_ITEM_DISPLAY:
+                try {
+                    fileTransfer = mFileTransferService.getFileTransfer(messageId);
+                    Utils.showDocumentAndExit(this, fileTransfer.getFile(),fileTransfer.getMimeType());
+                } catch (RcsServiceException e) {
+            showException(e);
+        }
                 return true;
 
             default:

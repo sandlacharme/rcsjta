@@ -21,6 +21,8 @@ package com.orangelabs.rcs.ri.sharing.image;
 import com.gsma.services.rcs.RcsService.Direction;
 import com.gsma.services.rcs.RcsServiceException;
 import com.gsma.services.rcs.contact.ContactId;
+import com.gsma.services.rcs.filetransfer.FileTransfer;
+import com.gsma.services.rcs.filetransfer.FileTransferService;
 import com.gsma.services.rcs.sharing.image.ImageSharing.ReasonCode;
 import com.gsma.services.rcs.sharing.image.ImageSharing.State;
 import com.gsma.services.rcs.sharing.image.ImageSharingListener;
@@ -100,6 +102,7 @@ public class ImageSharingList extends RcsFragmentActivity implements
      * List of items for contextual menu
      */
     private static final int MENU_ITEM_DELETE = 0;
+    private static final int MENU_ITEM_DISPLAY=1;
 
     private Handler mHandler = new Handler();
 
@@ -302,6 +305,7 @@ public class ImageSharingList extends RcsFragmentActivity implements
             return;
         }
         menu.add(0, MENU_ITEM_DELETE, MENU_ITEM_DELETE, R.string.menu_sharing_delete);
+        menu.add(0,MENU_ITEM_DISPLAY, MENU_ITEM_DISPLAY,"Display");
     }
 
     @Override
@@ -335,7 +339,12 @@ public class ImageSharingList extends RcsFragmentActivity implements
                     showExceptionThenExit(e);
                 }
                 return true;
+            case MENU_ITEM_DISPLAY :
+                FileTransferService mFileTransferService =getFileTransferApi();
+                //FileTransfer transfer = mFileTransferService.getFileTransfer(transferId);
 
+
+                return true;
             default:
                 return super.onContextItemSelected(item);
         }

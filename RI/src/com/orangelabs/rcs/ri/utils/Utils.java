@@ -89,6 +89,18 @@ public class Utils {
         activity.startActivity(intent);
     }
 
+    public static void showDocumentAndExit(final Activity activity, Uri uri,  String type) {
+        if (activity.isFinishing()) {
+            return;
+        }
+        String filename = FileUtils.getFileName(activity, uri);
+       // Toast.makeText(activity, activity.getString(R.string.label_receive_image, filename),
+         //       Toast.LENGTH_LONG).show();
+        Intent intent = new Intent();
+        intent.setAction(android.content.Intent.ACTION_VIEW);
+        intent.setDataAndType(uri, type);
+        activity.startActivity(intent);
+    }
     /**
      * Show an info with a specific title
      * 

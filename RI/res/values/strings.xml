@@ -364,6 +364,7 @@
     <string name="menu_view_groupdelivery">View delivery information</string>
     <string name="menu_delete_message">Delete</string>
     <string name="menu_resend_message">Resend</string>
+    <string name="menu_display_content">Display</string>
 
     <!-- Chat session menu -->
     <string name="menu_delete_chat_session">Delete</string>
