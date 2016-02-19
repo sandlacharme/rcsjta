@@ -107,7 +107,7 @@ public class ReceiveFileTransfer extends RcsActivity {
 
     private static final String VCARD_MIME_TYPE = "text/x-vcard";
 
-    private static final String AUDIO_MIME_TYPE = "audio/*";
+    private static final String AUDIO_MIME_TYPE = "audio/";
 
     private static final String BUNDLE_FTDAO_ID = "ftdao";
 
@@ -182,6 +182,7 @@ public class ReceiveFileTransfer extends RcsActivity {
         boolean resuming = FileTransferIntent.ACTION_RESUME.equals(intent.getAction());
         mGroupFileTransfer = GroupChatDAO.isGroupChat(mFtDao.getChatId(), contact);
 
+        FileTransfer.Disposition d= mFtDao.getDisposition();
         String from = RcsContactUtil.getInstance(this).getDisplayName(contact);
         TextView fromTextView = (TextView) findViewById(R.id.from);
         fromTextView.setText(getString(R.string.label_from_args, from));

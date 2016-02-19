@@ -93,12 +93,17 @@ public class Utils {
         if (activity.isFinishing()) {
             return;
         }
+        String strType = type.concat("*");
         String filename = FileUtils.getFileName(activity, uri);
-       // Toast.makeText(activity, activity.getString(R.string.label_receive_image, filename),
-         //       Toast.LENGTH_LONG).show();
+        if(strType.equals("image/*") )
+        {
+            Toast.makeText(activity, activity.getString(R.string.label_receive_image, filename),
+                    Toast.LENGTH_LONG).show();
+
+        }
         Intent intent = new Intent();
         intent.setAction(android.content.Intent.ACTION_VIEW);
-        intent.setDataAndType(uri, type);
+        intent.setDataAndType(uri, strType);
         activity.startActivity(intent);
     }
     /**

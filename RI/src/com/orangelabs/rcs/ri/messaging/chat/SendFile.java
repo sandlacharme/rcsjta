@@ -35,7 +35,6 @@ import com.orangelabs.rcs.ri.utils.Utils;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
@@ -52,7 +51,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * Send file
@@ -106,6 +104,7 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
     private CheckBox mCheckThumNail ;
     private CheckBox mCheckAudio;
 
+
     private static final String LOGTAG = LogUtils.getTag(SendFile.class.getSimpleName());
 
     @Override
@@ -130,13 +129,14 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
 
         mResumeBtn = (Button) findViewById(R.id.resume_btn);
         mResumeBtn.setOnClickListener(mBtnResumeListener);
+
         mResumeBtn.setEnabled(false);
 
-        mCheckThumNail = (CheckBox)findViewById(R.id.file_thumb);
-        mCheckThumNail.setVisibility(View.INVISIBLE);
+        mCheckThumNail = (CheckBox)findViewById(R.id.ft_thumb);
+        mCheckAudio= (CheckBox) findViewById(R.id.send_audio_msg);
 
-        mCheckAudio = (CheckBox)findViewById(R.id.send_audio_msg);
-        mCheckAudio.setVisibility(View.INVISIBLE);
+
+
 
 
         /* Register to API connection manager */
@@ -171,13 +171,14 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
 
     private void initiateTransfer() {
          /* Get thumbnail option */
-        CheckBox ftAudio = (CheckBox) findViewById(R.id.send_audio_msg);
-        boolean audioIsChecked = ftAudio.isChecked();
-        transferFile(mFile, mDispo, (mCheckThumNail.isChecked() && !audioIsChecked));
-        /* Hide buttons */
+
+        boolean thmNailIsChecked = mCheckThumNail.isChecked();
+        //TODO SL ICONE
+        transferFile(mFile, mDispo, thmNailIsChecked);
+        /* Hide buttons*/
         mInviteBtn.setVisibility(View.INVISIBLE);
         mSelectBtn.setVisibility(View.INVISIBLE);
-        mCheckThumNail.setVisibility(View.INVISIBLE);
+      //  mCheckThumNail.setVisibility(View.INVISIBLE);
 
     }
 
@@ -186,8 +187,8 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
         if (resultCode != RESULT_OK) {
             return;
         }
-       if(mCheckAudio.isChecked()) mCheckAudio.setChecked(false);
-       if(mCheckThumNail.isChecked()) mCheckThumNail.setChecked(false);
+        if(mCheckAudio.isChecked()) mCheckAudio.setChecked(false);
+        if(mCheckThumNail.isChecked()) mCheckThumNail.setChecked(false);
 
         switch (requestCode) {
             case RC_SELECT_IMAGE:
@@ -195,8 +196,9 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
                     /* Get selected photo URI */
                     displayFileInfo(data);
                     mDispo = FileTransfer.Disposition.ATTACH;
+                    mCheckThumNail.setVisibility(View.VISIBLE);
                     mCheckThumNail.setChecked(true);
-                    mCheckAudio.setVisibility(View.INVISIBLE);
+                    if(mCheckAudio.isEnabled()) mCheckAudio.setVisibility(View.INVISIBLE);
 
                 }
                 break;
@@ -204,9 +206,11 @@ public abstract class SendFile extends RcsActivity implements ISendFile {
                 if ((data != null) && (data.getData() != null)) {
                     /* Get selected audio URI */
                    displayFileInfo(data);
-                    mCheckAudio.setChecked(true);
+                    mCheckAudio.setVisibility(View.VISIBLE);
+                   mCheckAudio.setChecked(true);
                     mDispo = FileTransfer.Disposition.RENDER;
-                    mCheckThumNail.setVisibility(View.INVISIBLE);
+
+                    if(mCheckThumNail.isEnabled()) mCheckThumNail.setVisibility(View.INVISIBLE);
 
                 }
                 break;

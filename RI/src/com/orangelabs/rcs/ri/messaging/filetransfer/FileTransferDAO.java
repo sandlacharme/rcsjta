@@ -218,6 +218,7 @@ public class FileTransferDAO implements Parcelable {
         mReasonCode = FileTransfer.ReasonCode.valueOf(source.readInt());
         mFileExpiration = source.readLong();
         mFileIconExpiration = source.readLong();
+       mDisposition = FileTransfer.Disposition.valueOf(source.readInt());
     }
 
     private FileTransferDAO(ContentResolver resolver, String fileTransferId) {
@@ -259,9 +260,9 @@ public class FileTransferDAO implements Parcelable {
                     .getColumnIndexOrThrow(FileTransferLog.TRANSFERRED));
             mSize = cursor.getLong(cursor
                     .getColumnIndexOrThrow(FileTransferLog.FILESIZE));
-            int iDispo = Integer.parseInt(FileTransferLog.DISPOSITION);
-            if(iDispo ==1) mDisposition = FileTransfer.Disposition.RENDER;
-            else mDisposition = FileTransfer.Disposition.ATTACH;
+            mDisposition = FileTransfer.Disposition.valueOf(cursor.getInt(cursor
+                    .getColumnIndexOrThrow(FileTransferLog.DISPOSITION)));
+
             String fileicon = cursor.getString(cursor
                     .getColumnIndexOrThrow(FileTransferLog.FILEICON));
             if (fileicon != null) {
@@ -322,6 +323,7 @@ public class FileTransferDAO implements Parcelable {
         dest.writeLong(mTimestampDisplayed);
         dest.writeLong(mSizeTransferred);
         dest.writeLong(mSize);
+        dest.writeInt(mDisposition.toInt());
         if (mThumbnail != null) {
             dest.writeInt(1);
             dest.writeString(mThumbnail.toString());
