@@ -2,7 +2,23 @@
  * Copyright (C) 2014 Sony Mobile Communications Inc.
  * All rights, including trade secret rights, reserved.
  */
-
+/*******************************************************************************
+ * Software Name : RCS IMS Stack
+ *
+ * Copyright (C) 2010-2016 Orange.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
 package com.gsma.service.rcs.history;
 
 import com.gsma.rcs.core.content.FileContent;
@@ -61,6 +77,7 @@ import android.test.mock.MockContentResolver;
 import android.util.Log;
 
 import java.io.IOException;
+import java.sql.SQLDataException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -138,21 +155,17 @@ public class HistoryLogTest extends AndroidTestCase {
             HistoryLog.PROVIDER_ID, HistoryLog.BASECOLUMN_ID, HistoryLog.ID
     };
 
-    private static final String SELECTION_WITH_MESSAGE_ID = new StringBuilder(HistoryLog.ID)
-            .append("='").append(MESSAGE_ID).append("'").toString();
+    private static final String SELECTION_WITH_MESSAGE_ID = HistoryLog.ID + "='" + MESSAGE_ID + "'";
 
-    private static final String SELECTION_ID = new StringBuilder(HistoryLog.ID).append("=?")
-            .toString();
+    private static final String SELECTION_ID = HistoryLog.ID + "=?";
 
     private static final String[] SELECTION_ARGS = new String[] {
         MESSAGE_ID
     };
 
-    private static final String SORT_TIMESTAMP_ASC = new StringBuilder(HistoryLog.TIMESTAMP)
-            .append(" ASC").toString();
+    private static final String SORT_TIMESTAMP_ASC = HistoryLog.TIMESTAMP + " ASC";
 
-    private static final String SORT_TIMESTAMP_DESC = new StringBuilder(HistoryLog.TIMESTAMP)
-            .append(" DESC").toString();
+    private static final String SORT_TIMESTAMP_DESC = HistoryLog.TIMESTAMP + " DESC";
 
     private static IHistoryService mHistoryService;
 
@@ -167,6 +180,8 @@ public class HistoryLogTest extends AndroidTestCase {
     private long mTimestamp;
 
     private long mTimestampSent;
+
+    private  ContentResolver mRealResolver;
 
     private ContactUtil mContactUtil;
 
@@ -224,27 +239,27 @@ public class HistoryLogTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        ContentResolver realResolver = getContext().getContentResolver();
+         mRealResolver = getContext().getContentResolver();
         MockContentResolver mockResolver = new MockContentResolver();
         IsolatedContext iContext = new IsolatedContext(mockResolver, super.getContext());
 
-        mockResolver.addProvider(ChatLog.Message.CONTENT_URI.getAuthority(), realResolver
-                .acquireContentProviderClient(ChatLog.Message.CONTENT_URI)
+        mockResolver.addProvider(Message.CONTENT_URI.getAuthority(), mRealResolver
+                .acquireContentProviderClient(Message.CONTENT_URI)
                 .getLocalContentProvider());
-        mockResolver.addProvider(FileTransferLog.CONTENT_URI.getAuthority(), realResolver
+        mockResolver.addProvider(FileTransferLog.CONTENT_URI.getAuthority(), mRealResolver
                 .acquireContentProviderClient(FileTransferLog.CONTENT_URI)
                 .getLocalContentProvider());
-        mockResolver.addProvider(ImageSharingLog.CONTENT_URI.getAuthority(), realResolver
+        mockResolver.addProvider(ImageSharingLog.CONTENT_URI.getAuthority(), mRealResolver
                 .acquireContentProviderClient(ImageSharingLog.CONTENT_URI)
                 .getLocalContentProvider());
-        mockResolver.addProvider(VideoSharingLog.CONTENT_URI.getAuthority(), realResolver
+        mockResolver.addProvider(VideoSharingLog.CONTENT_URI.getAuthority(), mRealResolver
                 .acquireContentProviderClient(VideoSharingLog.CONTENT_URI)
                 .getLocalContentProvider());
-        mockResolver.addProvider(GeolocSharingLog.CONTENT_URI.getAuthority(), realResolver
+        mockResolver.addProvider(GeolocSharingLog.CONTENT_URI.getAuthority(), mRealResolver
                 .acquireContentProviderClient(GeolocSharingLog.CONTENT_URI)
                 .getLocalContentProvider());
 
-        HistoryProvider historyProvider = (HistoryProvider) realResolver
+        HistoryProvider historyProvider = (HistoryProvider) mRealResolver
                 .acquireContentProviderClient(HistoryLog.CONTENT_URI).getLocalContentProvider();
         mockResolver.addProvider(HistoryLog.CONTENT_URI.getAuthority(), historyProvider);
         mockResolver.addProvider(EXTERNAL_AUTHORITY, sMyContentProvider);
@@ -266,22 +281,22 @@ public class HistoryLogTest extends AndroidTestCase {
         mContactUtil = ContactUtil.getInstance(new ContactUtilMockContext(
                 new ContactUtilMockContext(getContext())));
 
-        mockResolver.addProvider(MessageData.CONTENT_URI.getAuthority(), realResolver
+        mockResolver.addProvider(MessageData.CONTENT_URI.getAuthority(), mRealResolver
                 .acquireContentProviderClient(MessageData.CONTENT_URI).getLocalContentProvider());
-        mockResolver.addProvider(FileTransferData.CONTENT_URI.getAuthority(), realResolver
+        mockResolver.addProvider(FileTransferData.CONTENT_URI.getAuthority(), mRealResolver
                 .acquireContentProviderClient(FileTransferData.CONTENT_URI)
                 .getLocalContentProvider());
-        mockResolver.addProvider(ImageSharingData.CONTENT_URI.getAuthority(), realResolver
+        mockResolver.addProvider(ImageSharingData.CONTENT_URI.getAuthority(), mRealResolver
                 .acquireContentProviderClient(ImageSharingData.CONTENT_URI)
                 .getLocalContentProvider());
-        mockResolver.addProvider(VideoSharingData.CONTENT_URI.getAuthority(), realResolver
+        mockResolver.addProvider(VideoSharingData.CONTENT_URI.getAuthority(), mRealResolver
                 .acquireContentProviderClient(VideoSharingData.CONTENT_URI)
                 .getLocalContentProvider());
-        mockResolver.addProvider(GeolocSharingData.CONTENT_URI.getAuthority(), realResolver
+        mockResolver.addProvider(GeolocSharingData.CONTENT_URI.getAuthority(), mRealResolver
                 .acquireContentProviderClient(GeolocSharingData.CONTENT_URI)
                 .getLocalContentProvider());
         mockResolver
-                .addProvider(HistoryLogData.CONTENT_URI.getAuthority(), realResolver
+                .addProvider(HistoryLogData.CONTENT_URI.getAuthority(), mRealResolver
                         .acquireContentProviderClient(HistoryLogData.CONTENT_URI)
                         .getLocalContentProvider());
 
@@ -295,7 +310,7 @@ public class HistoryLogTest extends AndroidTestCase {
                     FileTransferProvider.DATABASE_NAME, Context.MODE_PRIVATE, null);
             dbft.delete(FileTransferProvider.TABLE, null, null);
             dbft.close();
-        } catch (Exception e) {
+        } catch (Exception ignore) {
         }
 
         mHistoryService = new HistoryServiceImpl(getContext());
@@ -391,19 +406,19 @@ public class HistoryLogTest extends AndroidTestCase {
             if (ChatLog.Message.HISTORYLOG_MEMBER_ID == providerId) {
                 assertEquals(MESSAGE_ID, readUniqueId);
                 messageEncountered = true;
-                continue;
+
             } else if (FileTransferData.HISTORYLOG_MEMBER_ID == providerId) {
                 assertEquals(FILE_TRANSFER_ID, readUniqueId);
                 fileTransferEncountered = true;
-                continue;
+
             } else if (ImageSharingData.HISTORYLOG_MEMBER_ID == providerId) {
                 assertEquals(IMAGE_SHARING_ID, readUniqueId);
                 imageSharingEncountered = true;
-                continue;
+
             } else if (GeolocSharingData.HISTORYLOG_MEMBER_ID == providerId) {
                 assertEquals(GEOLOC_SHARING_ID, readUniqueId);
                 geolocSharingEncountered = true;
-                continue;
+
             } else {
                 assertEquals(VideoSharingData.HISTORYLOG_MEMBER_ID, providerId);
                 assertEquals(VIDEO_SHARING_ID, readUniqueId);
@@ -448,10 +463,14 @@ public class HistoryLogTest extends AndroidTestCase {
     }
 
     public void testQueryHistoryLogProviderWithoutProjection() throws RcsPermissionDeniedException,
-            PayloadException, IOException {
+            PayloadException, IOException ,SQLDataException {
         addItems();
         Uri historyUri = getUriWithAllInternalProviders();
         Cursor cursor = getContext().getContentResolver().query(historyUri, null, null, null, null);
+       if(cursor==null)
+       {
+          // throw SQLDataException();
+       }
         assertEquals(5, cursor.getCount());
         verifyHistoryLogEntries(cursor);
     }
@@ -533,7 +552,7 @@ public class HistoryLogTest extends AndroidTestCase {
     public void testRegisterInvalidExtraHistoryLogMember_badproviderid()
             throws RcsPermissionDeniedException, PayloadException, IOException {
         addItems();
-        Map<String, String> columnMapping = new HashMap<String, String>();
+        Map<String, String> columnMapping = new HashMap<>();
         columnMapping.put(HistoryLog.PROVIDER_ID, String.valueOf(INVALID_EXTERNAL_PROVIDER_ID));
 
         Uri database = Uri.fromFile(getContext().getDatabasePath(EXTERNAL_DATABASE_NAME));

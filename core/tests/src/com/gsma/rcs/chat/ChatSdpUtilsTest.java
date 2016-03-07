@@ -18,11 +18,8 @@
 
 package com.gsma.rcs.chat;
 
-import com.gsma.rcs.core.ims.network.sip.SipUtils;
 import com.gsma.rcs.core.ims.protocol.sdp.MediaDescription;
 import com.gsma.rcs.core.ims.protocol.sdp.SdpParser;
-import com.gsma.rcs.core.ims.protocol.sdp.SdpUtils;
-import com.gsma.rcs.utils.logger.Logger;
 
 import android.test.AndroidTestCase;
 
@@ -30,82 +27,46 @@ import java.util.Vector;
 
 public class ChatSdpUtilsTest extends AndroidTestCase {
 
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private String mLocalSocketProtocol;
 
-    private String sdp = null;
+    private String mAcceptedTypes;
 
-    private String ipAddress = null;
+    private String mWrappedTypes;
 
-    private int localMsrpPort = -1;
+    private String localSetup;
 
-    private String localSocketProtocol = null;
-
-    private String acceptedTypes = null;
-
-    private String wrappedTypes = null;
-
-    private String localSetup = null;
-
-    private String localMsrpPath = null;
+    private String localMsrpPath;
 
     protected void setUp() throws Exception {
         super.setUp();
-        // @formatter:off
-        /*
-         * v=0 o=- 3600492772 3600492772 IN IP4 10.29.67.37 s=- c=IN IP4 10.29.67.37 t=0 0 m=message
-         * 20000 TCP/MSRP * a=path:msrp://10.29.67.37:20000/1391503972255;tcp a=setup:actpass
-         * a=accept-types:message/cpim application/im-iscomposing+xml
-         * a=accept-wrapped-types:text/plain message/imdn+xml
-         * application/vnd.gsma.rcspushlocation+xml application/vnd.gsma.rcs-ft-http+xml a=sendrecv
-         */
-        // @formatter:on
-        String ntpTime = "3600492772";
-        ipAddress = "10.29.67.37";
-        localMsrpPort = 2000;
-        localSocketProtocol = "TCP/MSRP";
+        mLocalSocketProtocol = "TCP/MSRP";
         localMsrpPath = "msrp://10.29.67.37:20000/1391503972255;tcp";
         localSetup = "actpass";
-        acceptedTypes = "message/cpim application/im-iscomposing+xml";
-        wrappedTypes = "text/plain message/imdn+xml application/vnd.gsma.rcspushlocation+xml application/vnd.gsma.rcs-ft-http+xml";
-        sdp = "v=0" + SipUtils.CRLF + "o=- " + ntpTime + " " + ntpTime + " "
-                + SdpUtils.formatAddressType(ipAddress) + SipUtils.CRLF + "s=-" + SipUtils.CRLF
-                + "c=" + SdpUtils.formatAddressType(ipAddress) + SipUtils.CRLF + "t=0 0"
-                + SipUtils.CRLF + "m=message " + localMsrpPort + " " + localSocketProtocol + " *"
-                + SipUtils.CRLF + "a=path:" + localMsrpPath + SipUtils.CRLF + "a=setup:"
-                + localSetup + SipUtils.CRLF + "a=accept-types:" + acceptedTypes + SipUtils.CRLF
-                + "a=accept-wrapped-types:" + wrappedTypes + SipUtils.CRLF + "a=sendrecv"
-                + SipUtils.CRLF;
-
-    }
-
-    protected void tearDown() throws Exception {
-        super.tearDown();
+        mAcceptedTypes = "message/cpim application/im-iscomposing+xml";
+        mWrappedTypes = "text/plain message/imdn+xml application/vnd.gsma.rcspushlocation+xml application/vnd.gsma.rcs-ft-http+xml";
     }
 
     public void testbuildChatSDP() {
-        String buildSdp = SdpUtils
-                .buildChatSDP(ipAddress, localMsrpPort, localSocketProtocol, acceptedTypes,
-                        wrappedTypes, localSetup, localMsrpPath, SdpUtils.DIRECTION_SENDRECV);
-        logger.info("built SDP " + buildSdp);
-        logger.info("SDP " + sdp);
         // Parse the remote SDP part
-        SdpParser parser = new SdpParser(buildSdp.getBytes());
-
+        String sdp = "v=0 \n"
+                + "o=- 3600492772 3600492772 IN IP4 10.29.67.37 \n"
+                + "s=- \n"
+                + "c=IN IP4 10.29.67.37 \n"
+                + "t=0 0 \n"
+                + "m=message 20000 TCP/MSRP \n"
+                + "a=path:msrp://10.29.67.37:20000/1391503972255;tcp\n"
+                + "a=setup:actpass\n"
+                + "a=accept-types:message/cpim application/im-iscomposing+xml\n"
+                + "a=accept-wrapped-types:text/plain message/imdn+xml application/vnd.gsma.rcspushlocation+xml application/vnd.gsma.rcs-ft-http+xml\n"
+                + "a=sendrecv";
+        SdpParser parser = new SdpParser(sdp.getBytes());
         Vector<MediaDescription> media = parser.getMediaDescriptions();
         MediaDescription mediaDesc = media.elementAt(0);
-        // for (MediaDescription mediaDescription : media) {
-        // logger.info(media.toString());
-        // for (MediaAttribute attribute : mediaDescription.mediaAttributes) {
-        // logger.info("attribute: (name=" + attribute.getName() + ") (value=" +
-        // attribute.getValue() + ")");
-        // }
-        //
-        // }
         assertEquals(mediaDesc.getMediaAttribute("setup").getValue(), localSetup);
-        assertEquals(mediaDesc.getMediaAttribute("accept-types").getValue(), acceptedTypes);
-        assertEquals(mediaDesc.getMediaAttribute("accept-wrapped-types").getValue(), wrappedTypes);
+        assertEquals(mediaDesc.getMediaAttribute("accept-types").getValue(), mAcceptedTypes);
+        assertEquals(mediaDesc.getMediaAttribute("accept-wrapped-types").getValue(), mWrappedTypes);
         assertEquals(mediaDesc.getMediaAttribute("path").getValue(), localMsrpPath);
-        assertEquals(mediaDesc.mPort, localMsrpPort);
-        assertEquals(mediaDesc.mProtocol, localSocketProtocol);
+        assertEquals(mediaDesc.mPort, 20000);
+        assertEquals(mediaDesc.mProtocol, mLocalSocketProtocol);
     }
 }

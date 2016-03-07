@@ -1,11 +1,3 @@
-
-package com.gsma.rcs.cpim;
-
-import com.gsma.rcs.core.ims.service.im.chat.cpim.CpimMessage;
-import com.gsma.rcs.core.ims.service.im.chat.cpim.CpimParser;
-
-import android.test.AndroidTestCase;
-
 /*******************************************************************************
  * Software Name : RCS IMS Stack Copyright (C) 2010 France Telecom S.A. Licensed under the Apache
  * License, Version 2.0 (the "License"); you may not use this file except in compliance with the
@@ -15,50 +7,26 @@ import android.test.AndroidTestCase;
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
+
+package com.gsma.rcs.cpim;
+
+import com.gsma.rcs.core.ims.service.im.chat.cpim.CpimMessage;
+import com.gsma.rcs.core.ims.service.im.chat.cpim.CpimParser;
+
+import android.test.AndroidTestCase;
+
 public class CpimParserTest extends AndroidTestCase {
-    /**
-     * CRLF constant
-     */
-    private static final String CRLF = "\r\n";
 
-    /**
-     * Double CRLF constant
-     */
-    private static final String DOUBLE_CRLF = CRLF + CRLF;
-
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
+    private static final String sContentToParse = "CPIM sample: From: MR SANDERS <im:piglet@100akerwood.com>\n"
+            + "To: Depressed Donkey<im:eeyore@100akerwood.com> \n"
+            + "DateTime: 2000-12-13T13:40:00-08:00 Subject: the weather will be fine today \n"
+            + "Content-type: text/plain \n"
+            + "Content-ID: <1234567890@foo.com>\n"
+            + "\n"
+            + " Here is the text of my message.";
 
     public final void testCpimParserString() {
-        // @formatter:off
-        /*
-         * CPIM sample: From: MR SANDERS <im:piglet@100akerwood.com> To: Depressed Donkey
-         * <im:eeyore@100akerwood.com> DateTime: 2000-12-13T13:40:00-08:00 Subject: the weather will
-         * be fine today Content-type: text/plain Content-ID: <1234567890@foo.com> Here is the text
-         * of my message.
-         */
-        // @formatter:on
-        StringBuffer sb = new StringBuffer();
-        sb.append("From: MR SANDERS <im:piglet@100akerwood.com>");
-        sb.append(CRLF);
-        sb.append("To: Depressed Donkey <im:eeyore@100akerwood.com>");
-        sb.append(CRLF);
-        sb.append("DateTime: 2000-12-13T13:40:00-08:00");
-        sb.append(CRLF);
-        sb.append("Subject: the weather will be fine today");
-        sb.append(DOUBLE_CRLF);
-        sb.append("Content-type: text/plain");
-        sb.append(CRLF);
-        sb.append("Content-ID: <1234567890@foo.com>");
-        sb.append(DOUBLE_CRLF);
-        sb.append("Here is the text of my message.");
-        String text = sb.toString();
-        CpimMessage msg = (new CpimParser(text)).getCpimMessage();
+        CpimMessage msg = (new CpimParser(sContentToParse)).getCpimMessage();
         assertEquals(msg.getHeader("From"), "MR SANDERS <im:piglet@100akerwood.com>");
         assertEquals(msg.getHeader("To"), "Depressed Donkey <im:eeyore@100akerwood.com>");
         assertEquals(msg.getHeader("DateTime"), "2000-12-13T13:40:00-08:00");

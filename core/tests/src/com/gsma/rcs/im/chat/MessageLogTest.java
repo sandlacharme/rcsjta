@@ -41,6 +41,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.test.AndroidTestCase;
 
+import java.sql.SQLDataException;
 import java.util.Map;
 import java.util.Random;
 
@@ -74,39 +75,54 @@ public class MessageLogTest extends AndroidTestCase {
         mMessagingLog.deleteAllEntries();
     }
 
-    public void testAddGroupChatEvent() {
+    public void testAddGroupChatEvent() throws SQLDataException {
         // Add entry
         String messageId = mMessagingLog.addGroupChatEvent(mChatId, mContact1,
                 GroupChatEvent.Status.DEPARTED, mTimestamp);
         // Read entry
         Uri uri = Uri.withAppendedPath(MessageData.CONTENT_URI, messageId);
-        Cursor cursor = mContentResolver.query(uri, null, null, null, null);
-        // Check entry
-        assertEquals(cursor.getCount(), 1);
-        assertTrue(cursor.moveToFirst());
-        String id = cursor.getString(cursor.getColumnIndexOrThrow(ChatLog.Message.MESSAGE_ID));
-        String chatId = cursor.getString(cursor.getColumnIndexOrThrow(ChatLog.Message.CHAT_ID));
-        String contact = cursor.getString(cursor.getColumnIndexOrThrow(ChatLog.Message.CONTACT));
-        String mimeType = cursor.getString(cursor.getColumnIndexOrThrow(ChatLog.Message.MIME_TYPE));
-        int direction = cursor.getInt(cursor.getColumnIndexOrThrow(ChatLog.Message.DIRECTION));
-        int status = cursor.getInt(cursor.getColumnIndexOrThrow(ChatLog.Message.STATUS));
-        int reason = cursor.getInt(cursor.getColumnIndexOrThrow(ChatLog.Message.REASON_CODE));
-        long timestamp = cursor.getLong(cursor.getColumnIndexOrThrow(ChatLog.Message.TIMESTAMP));
-        long timestampSent = cursor.getLong(cursor
-                .getColumnIndexOrThrow(ChatLog.Message.TIMESTAMP_SENT));
+        Cursor cursor = null;
+        try {
+            cursor = mContentResolver.query(uri, null, null, null, null);
+            // Check entry
+            if (cursor == null) {
+                throw new SQLDataException("Can not query uri" + uri);
 
-        assertEquals(messageId, id);
-        assertEquals(mContact1.toString(), contact);
-        assertEquals(mChatId, chatId);
-        assertEquals(Message.MimeType.GROUPCHAT_EVENT, mimeType);
-        assertEquals(Direction.IRRELEVANT.toInt(), direction);
-        assertEquals(Message.GroupChatEvent.Status.DEPARTED.toInt(), status);
-        assertEquals(ReasonCode.UNSPECIFIED.toInt(), reason);
-        assertEquals(mTimestamp, timestamp);
-        assertEquals(mTimestamp, timestampSent);
+            }
+            assertEquals(cursor.getCount(), 1);
+            assertTrue(cursor.moveToFirst());
+            String id = cursor.getString(cursor.getColumnIndexOrThrow(ChatLog.Message.MESSAGE_ID));
+            String chatId = cursor.getString(cursor.getColumnIndexOrThrow(ChatLog.Message.CHAT_ID));
+            String contact = cursor
+                    .getString(cursor.getColumnIndexOrThrow(ChatLog.Message.CONTACT));
+            String mimeType = cursor.getString(cursor
+                    .getColumnIndexOrThrow(ChatLog.Message.MIME_TYPE));
+            int direction = cursor.getInt(cursor.getColumnIndexOrThrow(ChatLog.Message.DIRECTION));
+            int status = cursor.getInt(cursor.getColumnIndexOrThrow(ChatLog.Message.STATUS));
+            int reason = cursor.getInt(cursor.getColumnIndexOrThrow(ChatLog.Message.REASON_CODE));
+            long timestamp = cursor
+                    .getLong(cursor.getColumnIndexOrThrow(ChatLog.Message.TIMESTAMP));
+            long timestampSent = cursor.getLong(cursor
+                    .getColumnIndexOrThrow(ChatLog.Message.TIMESTAMP_SENT));
 
-        mLocalContentResolver.delete(uri, null, null);
-        assertEquals(false, mMessagingLog.isMessagePersisted(messageId));
+            assertEquals(messageId, id);
+            assertEquals(mContact1.toString(), contact);
+            assertEquals(mChatId, chatId);
+            assertEquals(Message.MimeType.GROUPCHAT_EVENT, mimeType);
+            assertEquals(Direction.IRRELEVANT.toInt(), direction);
+            assertEquals(Message.GroupChatEvent.Status.DEPARTED.toInt(), status);
+            assertEquals(ReasonCode.UNSPECIFIED.toInt(), reason);
+            assertEquals(mTimestamp, timestamp);
+            assertEquals(mTimestamp, timestampSent);
+
+            mLocalContentResolver.delete(uri, null, null);
+            assertEquals(false, mMessagingLog.isMessagePersisted(messageId));
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
     }
 
     public void testGetGroupChatEventsSimpleCase() {
