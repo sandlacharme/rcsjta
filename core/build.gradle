@@ -44,4 +44,5 @@ dependencies {
     compile project(':nist_sip')
     compile project(':api')
 	compile 'dnsjava:dnsjava:2.1.7'
+    androidTestCompile 'org.jetbrains:annotations:13.0'
 }

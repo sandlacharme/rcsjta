@@ -23,7 +23,7 @@ import android.test.AndroidTestCase;
 public class Base64Test extends AndroidTestCase {
 
     public final void testBase64() {
-        String ss = "2 + 2 = 4 , non 5?";
+        String ss = "2 + 2 = quatre , non 5?";
         assertEquals(Base64.encodeBase64ToString(ss.getBytes()), "MiArIDIgPSBxdWF0cmUsIG5vbiA1Pw==");
         assertEquals(new String(Base64.encodeBase64(ss.getBytes())),
                 "MiArIDIgPSBxdWF0cmUsIG5vbiA1Pw==");

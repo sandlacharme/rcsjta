@@ -50,19 +50,10 @@ public class CpimMessage {
     public static final String HEADER_TO = "To";
 
     /**
-     * Header "cc"
-     */
-    public static final String HEADER_CC = "cc";
-
-    /**
      * Header "DateTime"
      */
     public static final String HEADER_DATETIME = "DateTime";
 
-    /**
-     * Header "Subject"
-     */
-    public static final String HEADER_SUBJECT = "Subject";
 
     /**
      * Header "NS"
@@ -74,10 +65,6 @@ public class CpimMessage {
      */
     public static final String HEADER_CONTENT_LENGTH = "Content-length";
 
-    /**
-     * Header "Require"
-     */
-    public static final String HEADER_REQUIRE = "Require";
 
     /**
      * Header "Content-Disposition"

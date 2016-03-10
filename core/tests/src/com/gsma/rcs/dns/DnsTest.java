@@ -36,7 +36,7 @@ import javax2.sip.ListeningPoint;
 
 public class DnsTest extends AndroidTestCase {
 
-    private static Logger sLogger = Logger.getLogger(DnsTest.class().getName());
+    private static Logger sLogger = Logger.getLogger(DnsTest.class.getName());
 
     public void testDnsLib() {
         String domain = "rcs.lannion.com";

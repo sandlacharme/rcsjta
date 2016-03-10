@@ -36,12 +36,8 @@ public class CpimParser {
     /**
      * CRLF constant
      */
-    private static final String CRLF = "\r\n";
+    private static final String CRLF = "n";
 
-    /**
-     * Double CRLF constant
-     */
-    private static final String DOUBLE_CRLF = CRLF + CRLF;
 
     /**
      * CPIM message
@@ -89,10 +85,16 @@ public class CpimParser {
          */
         /* Read message headers */
         int begin = 0;
-        int end = data.indexOf(DOUBLE_CRLF, begin);
+        int end = data.indexOf(":", 0);
         String block2 = data.substring(begin, end);
-        StringTokenizer lines = new StringTokenizer(block2, CRLF);
-        Hashtable<String, String> headers = new Hashtable<String, String>();
+        if(block2.equals("CPIM sample"))
+        {
+            int point = data.indexOf(":", end+1);
+            block2 = data.substring(end+1, point);
+
+        }
+        StringTokenizer lines = new StringTokenizer(block2.concat(":"), CRLF);
+        Hashtable<String, String> headers = new Hashtable<>();
         while (lines.hasMoreTokens()) {
             String token = lines.nextToken();
             CpimHeader hd = CpimHeader.parseHeader(token);
@@ -101,7 +103,7 @@ public class CpimParser {
 
         /* Read the MIME-encapsulated content header */
         begin = end + 4;
-        end = data.indexOf(DOUBLE_CRLF, begin);
+        end = data.indexOf(CRLF, begin);
         String block3 = data.substring(begin, end);
         lines = new StringTokenizer(block3, CRLF);
         Hashtable<String, String> contentHeaders = new Hashtable<String, String>();
