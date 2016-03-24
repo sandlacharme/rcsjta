@@ -18,17 +18,20 @@ import android.test.AndroidTestCase;
 public class CpimParserTest extends AndroidTestCase {
 
     private static final String sContentToParse = "CPIM sample: From: MR SANDERS <im:piglet@100akerwood.com>\n"
-            + "To: Depressed Donkey<im:eeyore@100akerwood.com> \n"
-            + "DateTime: 2000-12-13T13:40:00-08:00 Subject: the weather will be fine today \n"
-            + "Content-type: text/plain \n"
+            + "To: Depressed Donkey<im:eeyore@100akerwood.com>\n"
+            + "DateTime: 2000-12-13T13:40:00-08:00 Subject: the weather will be fine today\n"
+            + "Content-type: text/plain\n"
             + "Content-ID: <1234567890@foo.com>\n"
             + "\n"
             + " Here is the text of my message.";
 
+
+
+
     public final void testCpimParserString() {
         CpimMessage msg = (new CpimParser(sContentToParse)).getCpimMessage();
         assertEquals(msg.getHeader("From"), "MR SANDERS <im:piglet@100akerwood.com>");
-        assertEquals(msg.getHeader("To"), "Depressed Donkey <im:eeyore@100akerwood.com>");
+        assertEquals(msg.getHeader("To"), "Depressed Donkey<im:eeyore@100akerwood.com>");
         assertEquals(msg.getHeader("DateTime"), "2000-12-13T13:40:00-08:00");
         assertEquals(msg.getHeader("Subject"), "the weather will be fine today");
         assertEquals(msg.getContentHeader("Content-ID"), "<1234567890@foo.com>");

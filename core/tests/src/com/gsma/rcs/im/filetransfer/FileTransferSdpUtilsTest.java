@@ -31,26 +31,23 @@ public class FileTransferSdpUtilsTest extends TestCase {
 
     private static Logger sLogger = Logger.getLogger(FileTransferSdpUtilsTest.class.getName());
 
-    private String localSocketProtocol = null;
-
-    private String acceptedTypes = null;
-
-    private String localSetup = null;
-
-    private String localMsrpPath = null;
-
-    private String fileTransferID = null;
-
-    private String fileSelector = null;
-
     public void testbuildFtSDP() {
+
+        int maxSize = 15728640;
+        int localMsrpPort = 20000;
+        String localSocketProtocol = "TCP/MSRP";
+        String localMsrpPath = "msrp://10.29.67.37:20000/1391518338240;tcp";
+        String localSetup = "actpass";
+        String acceptedTypes = "image/jpeg";
+        String fileTransferID = "1391518338244";
+        String fileSelector = "name:\"phototmp_3_1_1_1.jpg\" type:image/jpegize:195490";
 
         String sdp = "\n" + "v=0 \n" + "o=- 3600507138 3600507138 IN IP4 10.29.67.37 \n" + "s=- \n"
                 + "c=IN IP4 10.29.67.37 \n" + "t=0 0\n" + "m=message 20000 TCP/MSRP\n"
                 + "a=accept-types:image/jpeg \n" + "a=file-transfer-id:1391518338244\n"
                 + "a=file-disposition:attachment \n"
                 + "a=file-selector:name:\"phototmp_3_1_1_1.jpg\" type:image/jpegize:195490 \n"
-                + "a=setup:actpass\n" + "a=path:msrp://10.29.67.37:20000/1391518338240;tcp\n"
+                + "a=setup:actpass \n" + "a=path:msrp://10.29.67.37:20000/1391518338240;tcp\n"
                 + "a=sendonly\n" + "a=max-size:15728640";
 
         sLogger.info("SDP " + sdp);
@@ -65,17 +62,17 @@ public class FileTransferSdpUtilsTest extends TestCase {
                         + attribute.getValue() + ")");
             }
         }
-        assertEquals(mediaDesc.getMediaAttribute("setup").getValue(), localSetup);
-        assertEquals(mediaDesc.getMediaAttribute("file-transfer-id").getValue(), fileTransferID);
-        assertEquals(mediaDesc.getMediaAttribute("file-disposition").getValue(), "attachment");
+        assertEquals(mediaDesc.getMediaAttribute("setup").getValue().trim(), localSetup);
+        assertEquals(mediaDesc.getMediaAttribute("file-transfer-id").getValue().trim(),
+                fileTransferID);
+        assertEquals(mediaDesc.getMediaAttribute("file-disposition").getValue().trim(),
+                "attachment");
 
-        int maxSize = -1;
-        assertEquals(mediaDesc.getMediaAttribute("max-size").getValue(), "" + maxSize);
-        assertEquals(mediaDesc.getMediaAttribute("accept-types").getValue(), acceptedTypes);
-        assertEquals(mediaDesc.getMediaAttribute("path").getValue(), localMsrpPath);
-        assertEquals(mediaDesc.getMediaAttribute("file-selector").getValue(), fileSelector);
+        assertEquals(mediaDesc.getMediaAttribute("max-size").getValue().trim(), "" + maxSize);
+        assertEquals(mediaDesc.getMediaAttribute("accept-types").getValue().trim(), acceptedTypes);
+        assertEquals(mediaDesc.getMediaAttribute("path").getValue().trim(), localMsrpPath);
+        assertEquals(mediaDesc.getMediaAttribute("file-selector").getValue().trim(), fileSelector);
 
-        int localMsrpPort = -1;
         assertEquals(mediaDesc.mPort, localMsrpPort);
         assertEquals(mediaDesc.mProtocol, localSocketProtocol);
     }

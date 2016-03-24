@@ -54,7 +54,6 @@ public class CpimMessage {
      */
     public static final String HEADER_DATETIME = "DateTime";
 
-
     /**
      * Header "NS"
      */
@@ -64,7 +63,6 @@ public class CpimMessage {
      * Header "Content-length"
      */
     public static final String HEADER_CONTENT_LENGTH = "Content-length";
-
 
     /**
      * Header "Content-Disposition"
@@ -79,12 +77,12 @@ public class CpimMessage {
     /**
      * MIME headers
      */
-    private Hashtable<String, String> headers = new Hashtable<String, String>();
+    private Hashtable<String, String> headers = new Hashtable<>();
 
     /**
      * MIME content headers
      */
-    private Hashtable<String, String> contentHeaders = new Hashtable<String, String>();
+    private Hashtable<String, String> contentHeaders = new Hashtable<>();
 
     /**
      * Constructor

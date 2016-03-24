@@ -67,7 +67,7 @@ public class SipUtils {
     /**
      * CRLF constant
      */
-    public final static String CRLF = "\r\n";
+    public final static String CRLF = "\n";
 
     public final static char WHITESPACE = ' ';
 
