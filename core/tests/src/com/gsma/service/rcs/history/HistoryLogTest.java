@@ -68,9 +68,10 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.Build;
+
 import android.os.RemoteException;
 import android.provider.BaseColumns;
 import android.test.AndroidTestCase;
@@ -78,9 +79,10 @@ import android.test.IsolatedContext;
 import android.test.mock.MockContentResolver;
 import android.util.Log;
 
-import org.jetbrains.annotations.Nullable;
+
 
 import java.io.IOException;
+import java.net.URI;
 import java.sql.SQLDataException;
 import java.util.HashMap;
 import java.util.Map;
@@ -232,26 +234,53 @@ public class HistoryLogTest extends AndroidTestCase {
         }
 
         @Override
-        public String getType(@Nullable Uri uri) {
+        public String getType( Uri uri) {
             return null;
         }
 
         @Override
-        public Uri insert(@Nullable Uri uri, @Nullable ContentValues values) {
+        public Uri insert( Uri uri, ContentValues values) {
             return null;
         }
 
         @Override
-        public int delete(@Nullable Uri uri, @Nullable String selection,
-                @Nullable String[] selectionArgs) {
+        public int delete( Uri uri, String selection,
+                 String[] selectionArgs) {
             return 0;
         }
 
         @Override
-        public int update(@Nullable Uri uri, @Nullable ContentValues values,
-                @Nullable String selection, @Nullable String[] selectionArgs) {
+        public int update( Uri uri,  ContentValues values,
+                String selection,String[] selectionArgs) {
             return 0;
         }
+    }
+
+    ContentResolver getContentResolver()
+    {
+        ContentResolver realResolver = getContext().getContentResolver();
+        if (realResolver == null) {
+            throw new SQLException("mockResolver is NULL");
+        }
+        return realResolver;
+    }
+
+    MockContentResolver getMokResolver()
+    {
+        MockContentResolver mockResolver = new MockContentResolver();
+        if (mockResolver == null) {
+            throw new SQLException("mockResolver is NULL");
+        }
+        return mockResolver;
+    }
+
+    ContentProvider getContentProvider(ContentResolver resolver,Uri uri)
+    {
+        ContentProvider provider=resolver.acquireContentProviderClient(uri).getLocalContentProvider();
+        if (provider == null) {
+            throw new SQLException("mockResolver is NULL");
+        }
+        return provider;
     }
 
     protected void setUp() throws Exception {
@@ -260,11 +289,7 @@ public class HistoryLogTest extends AndroidTestCase {
         ContentResolver mRealResolver = null;
         MockContentResolver mockResolver = null;
         ContentProvider provider;
-        try {
-            mRealResolver = getContext().getContentResolver();
-            if (mRealResolver == null) {
-                throw new NullPointerException("mRealResolver is NULL");
-            }
+        mRealResolver=getContentResolver();
 
             mockResolver = new MockContentResolver();
 
@@ -280,22 +305,17 @@ public class HistoryLogTest extends AndroidTestCase {
                     || mStrGeolocAuthority.isEmpty() || mStrHistoryAuthority.isEmpty()) {
                 throw new IllegalStateException("Authority is Empty");
             }
-        } catch (Exception ignore) {
-        }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (mockResolver == null) {
-                throw new NullPointerException("mockResolver is NULL");
-            }
-            provider = Objects.requireNonNull(
-                    mRealResolver.acquireContentProviderClient(Message.CONTENT_URI))
-                    .getLocalContentProvider();
-            mockResolver.addProvider(mStrMsgAuthority, Objects.requireNonNull(provider));
 
-            provider = Objects.requireNonNull(
-                    mRealResolver.acquireContentProviderClient(FileTransferLog.CONTENT_URI))
-                    .getLocalContentProvider();
-            mockResolver.addProvider(mStrFTAuthority, Objects.requireNonNull(provider));
+        mockResolver=getMokResolver();
+
+            provider = getContentProvider(mRealResolver, Message.CONTENT_URI);
+
+            mockResolver.addProvider(mStrMsgAuthority, provider);
+
+            provider = getContentProvider(mRealResolver, FileTransferLog.CONTENT_URI);
+
+            mockResolver.addProvider(mStrFTAuthority, provider);
 
             provider = Objects.requireNonNull(
                     mRealResolver.acquireContentProviderClient(ImageSharingLog.CONTENT_URI))
@@ -372,13 +392,12 @@ public class HistoryLogTest extends AndroidTestCase {
             sLocalContentResolver.delete(VideoSharingData.CONTENT_URI, null, null);
             sLocalContentResolver.delete(GeolocSharingData.CONTENT_URI, null, null);
 
-            try {
+
                 SQLiteDatabase dbft = getContext().openOrCreateDatabase(
                         FileTransferProvider.DATABASE_NAME, Context.MODE_PRIVATE, null);
                 dbft.delete(FileTransferProvider.TABLE, null, null);
                 dbft.close();
-            } catch (Exception ignore) {
-            }
+
 
             sHistoryService = new HistoryServiceImpl(getContext());
 
@@ -390,7 +409,7 @@ public class HistoryLogTest extends AndroidTestCase {
             db.close();
             mTimestamp = mRandom.nextLong();
             mTimestampSent = mRandom.nextLong();
-        }
+
 
     }// setup
 

@@ -22,6 +22,7 @@
 
 package com.gsma.rcs.richcall;
 
+import com.gsma.rcs.core.ims.network.sip.SipUtils;
 import com.gsma.rcs.core.ims.protocol.rtp.codec.video.h264.H264Config;
 import com.gsma.rcs.core.ims.protocol.rtp.codec.video.h264.profiles.H264Profile1_2;
 import com.gsma.rcs.core.ims.protocol.rtp.codec.video.h264.profiles.H264Profile1b;
@@ -68,36 +69,57 @@ public class VideoSdpTest extends AndroidTestCase {
 
     }
 
+
     public void testCreateSdp() {
         // Create SDP
         String createdSdp = "v=tester\n"
                 + VideoSdpBuilder.buildSdpOfferWithoutOrientation(mCodecs, RTP_PORT);
         // TEST SDP
-        String videoSdp = "v=tester\n" + "m=video 12345 RTP/AVP 99 98 97 96\n" + "a=framerate:15\n"
-                + "a=rtpmap:99 H264/90000\n" + "a=framesize:99 352-288\n"
-                + "a=fmtp:99 profile-level-id=42800c;packetization-mode=1\n"
-                + "a=rtpmap:98 H264/90000\n" + "a=framesize:98 352-288\n"
-                + "a=fmtp:98 profile-level-id=42800c;packetization-mode=1\n"
-                + "a=rtpmap:97 H264/90000\n" + "a=framesize:97 320-240\n"
-                + "a=fmtp:97 profile-level-id=42800c;packetization-mode=1\n"
-                + "a=rtpmap:96 H264/90000\n" + "a=framesize:96 176-144\n"
-                + "a=fmtp:96 profile-level-id=42900b;packetization-mode=1\n";
+        // @formatter:off
+        String videoSdp = "v=tester" + SipUtils.CRLF +
+                "m=video 12345 RTP/AVP 99 98 97 96" + SipUtils.CRLF +
+                "a=framerate:15" + SipUtils.CRLF +
+                "a=rtpmap:99 H264/90000" + SipUtils.CRLF +
+                "a=framesize:99 352-288" + SipUtils.CRLF +
+                "a=fmtp:99 profile-level-id=42800c;packetization-mode=1" + SipUtils.CRLF +
+                "a=rtpmap:98 H264/90000" + SipUtils.CRLF +
+                "a=framesize:98 352-288" + SipUtils.CRLF +
+                "a=fmtp:98 profile-level-id=42800c;packetization-mode=1" + SipUtils.CRLF +
+                "a=rtpmap:97 H264/90000" + SipUtils.CRLF +
+                "a=framesize:97 320-240" + SipUtils.CRLF +
+                "a=fmtp:97 profile-level-id=42800c;packetization-mode=1" + SipUtils.CRLF +
+                "a=rtpmap:96 H264/90000" + SipUtils.CRLF +
+                "a=framesize:96 176-144" + SipUtils.CRLF +
+                "a=fmtp:96 profile-level-id=42900b;packetization-mode=1" + SipUtils.CRLF;
+        // @formatter:on
         assertEquals(videoSdp, createdSdp);
     }
 
     public void testParseSdp() {
         // Parse the remote SDP part
-        String videoSdp2 = "v=tester\n" + "m=video 12345 RTP/AVP 99 98 97 96\n" + "b=AS:128\n"
-                + "b=RS:256\n" + "b=RR:1024\n" + "a=rtpmap:99 H264/90000\n"
-                + "a=framesize:99 352-288\n" + "a=framerate:99 15\n"
-                + "a=fmtp:99 profile-level-id=42800c;packetization-mode=1\n"
-                + "a=rtpmap:98 H264/90000\n" + "a=framesize:98 352-288\n" + "a=framerate:98 12\n"
-                + "a=fmtp:98 profile-level-id=42800c;packetization-mode=1\n"
-                + "a=rtpmap:97 H264/90000\n" + "a=framesize:97 320-240\n" + "a=framerate:97 12\n"
-                + "a=fmtp:97 profile-level-id=42800c;packetization-mode=1\n"
-                + "a=rtpmap:96 H264/90000\n" + "a=framesize:96 176-144\n" + "a=framerate:96 10\n"
-                + "a=fmtp:96 profile-level-id=42900b;packetization-mode=1\n";
-
+        // @formatter:off
+        String videoSdp2 = "v=tester" + SipUtils.CRLF +
+                "m=video 12345 RTP/AVP 99 98 97 96" + SipUtils.CRLF +
+                "b=AS:128" + SipUtils.CRLF +
+                "b=RS:256" + SipUtils.CRLF +
+                "b=RR:1024" + SipUtils.CRLF +
+                "a=rtpmap:99 H264/90000" + SipUtils.CRLF +
+                "a=framesize:99 352-288" + SipUtils.CRLF +
+                "a=framerate:99 15" + SipUtils.CRLF +
+                "a=fmtp:99 profile-level-id=42800c;packetization-mode=1" + SipUtils.CRLF +
+                "a=rtpmap:98 H264/90000" + SipUtils.CRLF +
+                "a=framesize:98 352-288" + SipUtils.CRLF +
+                "a=framerate:98 12" + SipUtils.CRLF +
+                "a=fmtp:98 profile-level-id=42800c;packetization-mode=1" + SipUtils.CRLF +
+                "a=rtpmap:97 H264/90000" + SipUtils.CRLF +
+                "a=framesize:97 320-240" + SipUtils.CRLF +
+                "a=framerate:97 12" + SipUtils.CRLF +
+                "a=fmtp:97 profile-level-id=42800c;packetization-mode=1" + SipUtils.CRLF +
+                "a=rtpmap:96 H264/90000" + SipUtils.CRLF +
+                "a=framesize:96 176-144" + SipUtils.CRLF +
+                "a=framerate:96 10" + SipUtils.CRLF +
+                "a=fmtp:96 profile-level-id=42900b;packetization-mode=1" + SipUtils.CRLF;
+        // @formatter:on
         SdpParser parser = new SdpParser(videoSdp2.getBytes());
         // Test port
         MediaDescription mediaVideo = parser.getMediaDescription("video");
