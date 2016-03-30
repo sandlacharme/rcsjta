@@ -18,9 +18,11 @@
 
 package com.gsma.rcs.im.filetransfer;
 
+import com.gsma.rcs.core.ims.network.sip.SipUtils;
 import com.gsma.rcs.core.ims.protocol.sdp.MediaAttribute;
 import com.gsma.rcs.core.ims.protocol.sdp.MediaDescription;
 import com.gsma.rcs.core.ims.protocol.sdp.SdpParser;
+import com.gsma.rcs.core.ims.protocol.sdp.SdpUtils;
 import com.gsma.rcs.utils.logger.Logger;
 
 import junit.framework.TestCase;
@@ -33,23 +35,42 @@ public class FileTransferSdpUtilsTest extends TestCase {
 
     public void testbuildFtSDP() {
 
-        int maxSize = 15728640;
+        /*
+         * v=0 o=- 3600507138 3600507138 IN IP4 10.29.67.37 s=- c=IN IP4 10.29.67.37 t=0 0 m=message
+         * 20000 TCP/MSRP * a=accept-types:image/jpeg a=file-transfer-id:1391518338244
+         * a=file-disposition:attachment a=file-selector:name:"phototmp_3_1_1_1.jpg" type:image/jpeg
+         * size:195490 a=setup:actpass a=path:msrp://10.29.67.37:20000/1391518338240;tcp a=sendonly
+         * a=max-size:15728640
+         */
+        // @formatter:on
+
+        String ntpTime = "3600507138 3600507138";
+        String ipAddress = "10.29.67.37";
         int localMsrpPort = 20000;
         String localSocketProtocol = "TCP/MSRP";
-        String localMsrpPath = "msrp://10.29.67.37:20000/1391518338240;tcp";
+        String localMsrpPath = "msrp://10.29.67.37:20000/1391503972255;tcp";
         String localSetup = "actpass";
         String acceptedTypes = "image/jpeg";
         String fileTransferID = "1391518338244";
-        String fileSelector = "name:\"phototmp_3_1_1_1.jpg\" type:image/jpegize:195490";
-
-        String sdp = "\n" + "v=0 \n" + "o=- 3600507138 3600507138 IN IP4 10.29.67.37 \n" + "s=- \n"
-                + "c=IN IP4 10.29.67.37 \n" + "t=0 0\n" + "m=message 20000 TCP/MSRP\n"
-                + "a=accept-types:image/jpeg \n" + "a=file-transfer-id:1391518338244\n"
-                + "a=file-disposition:attachment \n"
-                + "a=file-selector:name:\"phototmp_3_1_1_1.jpg\" type:image/jpegize:195490 \n"
-                + "a=setup:actpass \n" + "a=path:msrp://10.29.67.37:20000/1391518338240;tcp\n"
-                + "a=sendonly\n" + "a=max-size:15728640";
-
+        int maxSize = 15728640;
+        String fileSelector = "name:\"phototmp_3_1_1_1.jpg\" type:image/jpeg size:195490";
+        // / @formatter:off
+        String sdp = "v=0" + SipUtils.CRLF
+                + "o=- " + ntpTime + " " + ntpTime + " "
+                + SdpUtils.formatAddressType(ipAddress) + SipUtils.CRLF
+                + "s=-" + SipUtils.CRLF
+                + "c=" + SdpUtils.formatAddressType(ipAddress) + SipUtils.CRLF
+                + "t=0 0" + SipUtils.CRLF
+                + "m=message " + localMsrpPort + " " + localSocketProtocol + " *" + SipUtils.CRLF
+                + "a=path:" + localMsrpPath + SipUtils.CRLF
+                + "a=setup:" + localSetup + SipUtils.CRLF
+                + "a=accept-types: " + acceptedTypes + SipUtils.CRLF
+                + "a=file-transfer-id:" + fileTransferID + SipUtils.CRLF
+                + "a=file-disposition:attachment" + SipUtils.CRLF
+                + "a=sendonly" + SipUtils.CRLF
+                + "a=max-size:" + maxSize + SipUtils.CRLF
+                + "a=file-selector:" + fileSelector + SipUtils.CRLF;
+        // @formatter:on
         sLogger.info("SDP " + sdp);
         // Parse the remote SDP part
         SdpParser parser = new SdpParser(sdp.getBytes());

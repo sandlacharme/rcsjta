@@ -18,8 +18,10 @@
 
 package com.gsma.rcs.chat;
 
+import com.gsma.rcs.core.ims.network.sip.SipUtils;
 import com.gsma.rcs.core.ims.protocol.sdp.MediaDescription;
 import com.gsma.rcs.core.ims.protocol.sdp.SdpParser;
+import com.gsma.rcs.core.ims.protocol.sdp.SdpUtils;
 
 import android.test.AndroidTestCase;
 
@@ -27,51 +29,53 @@ import java.util.Vector;
 
 public class ChatSdpUtilsTest extends AndroidTestCase {
 
-    private String mLocalSocketProtocol;
-
-    private String mAcceptedTypes;
-
-    private String mWrappedTypes;
-
-    private String mLocalSetup;
-
-    private String mLocalMsrpPath;
-
 
     protected void setUp() throws Exception {
         super.setUp();
-        mLocalSocketProtocol = "TCP/MSRP";
-        mLocalMsrpPath = "msrp://10.29.67.37:20000/1391503972255;tcp";
-        mLocalSetup = "actpass";
-        mAcceptedTypes = "message/cpim application/im-iscomposing+xml";
-        mWrappedTypes = "text/plain message/imdn+xml application/vnd.gsma.rcspushlocation+xml application/vnd.gsma.rcs-ft-http+xml";
-        mLocalSetup = "actpass";
-
 
     }
 
     public void testbuildChatSDP() {
+
+        /***
+         * v=0 o=- 3667904944 3667904944 IN IP4 192.168.1.50 s=- c=IN IP4 192.168.1.50 t=0 0
+         * m=message 20000 TCP/MSRP * a=accept-types:message/cpim application/im-iscomposing+xml
+         * a=accept-wrapped-types:text/plain message/imdn+xml
+         * application/vnd.gsma.rcspushlocation+xml application/vnd.gsma.rcs-ft-http+xml
+         * a=setup:actpass a=path:msrp://192.168.1.50:20000/1458916144436;tcp a=sendrecv
+         */
         // Parse the remote SDP part
+        String ntpTime = "3667904944 3667904944";
+        String ipAddress = "192.168.1.50";
+        int localMsrpPort = 20000;
+        String localSocketProtocol = "TCP/MSRP";
+        String localMsrpPath = "msrp://10.29.67.37:20000/1391503972255;tcp";
+        String localSetup = "actpass";
+        String acceptedTypes = "message/cpim application/im-iscomposing+xml";
+        String wrappedTypes = "text/plain message/imdn+xml application/vnd.gsma.rcspushlocation+xml application/vnd.gsma.rcs-ft-http+xml";
 
-        String sdp = "v=0\n"
-                + "s=-\n"
-                + "t=0 0\n"
-                + "m=message 20000 TCP/MSRP\n"
-                + "a=path:msrp://10.29.67.37:20000/1391503972255;tcp\n"
-                + "a=setup:actpass\n"
-                + "a=accept-types:message/cpim application/im-iscomposing+xml\n"
-                + "a=accept-wrapped-types:text/plain message/imdn+xml application/vnd.gsma.rcspushlocation+xml application/vnd.gsma.rcs-ft-http+xml\n"
-                + "a=sendrecv\n";
+        //@formatter:off
+        String sdp = "v=0" + SipUtils.CRLF
+                + "o=- " + ntpTime + " " + ntpTime + " " + SdpUtils.formatAddressType(ipAddress) + SipUtils.CRLF
+                + "s=-" + SipUtils.CRLF
+                + "c=" + SdpUtils.formatAddressType(ipAddress) + SipUtils.CRLF
+                + "t=0 0" + SipUtils.CRLF
+                + "m=message " + localMsrpPort + " " + localSocketProtocol + " *" + SipUtils.CRLF
+                + "a=path:" + localMsrpPath + SipUtils.CRLF
+                + "a=setup:" + localSetup + SipUtils.CRLF
+                + "a=accept-types:" + acceptedTypes + SipUtils.CRLF
+                + "a=accept-wrapped-types:" + wrappedTypes + SipUtils.CRLF
+                + "a=sendrecv" + SipUtils.CRLF;
 
-
+        //@formatter:on
         SdpParser parser = new SdpParser(sdp.getBytes());
         Vector<MediaDescription> media = parser.getMediaDescriptions();
         MediaDescription mediaDesc = media.elementAt(0);
-        assertEquals(mediaDesc.getMediaAttribute("setup").getValue(), mLocalSetup);
-        assertEquals(mediaDesc.getMediaAttribute("accept-types").getValue(), mAcceptedTypes);
-        assertEquals(mediaDesc.getMediaAttribute("accept-wrapped-types").getValue(), mWrappedTypes);
-        assertEquals(mediaDesc.getMediaAttribute("path").getValue().trim(), mLocalMsrpPath);
-        assertEquals(mediaDesc.mPort, 20000);
-        assertEquals(mediaDesc.mProtocol.trim(), mLocalSocketProtocol);
+        assertEquals(mediaDesc.getMediaAttribute("setup").getValue().trim(), localSetup);
+        assertEquals(mediaDesc.getMediaAttribute("accept-types").getValue().trim(), acceptedTypes);
+        assertEquals(mediaDesc.getMediaAttribute("accept-wrapped-types").getValue().trim(), wrappedTypes);
+        assertEquals(mediaDesc.getMediaAttribute("path").getValue().trim(), localMsrpPath);
+        assertEquals(mediaDesc.mPort, localMsrpPort);
+        assertEquals(mediaDesc.mProtocol.trim(), localSocketProtocol);
     }
 }
