@@ -70,6 +70,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 
 import android.os.RemoteException;
@@ -79,10 +80,7 @@ import android.test.IsolatedContext;
 import android.test.mock.MockContentResolver;
 import android.util.Log;
 
-
-
 import java.io.IOException;
-import java.net.URI;
 import java.sql.SQLDataException;
 import java.util.HashMap;
 import java.util.Map;
@@ -234,30 +232,27 @@ public class HistoryLogTest extends AndroidTestCase {
         }
 
         @Override
-        public String getType( Uri uri) {
+        public String getType(Uri uri) {
             return null;
         }
 
         @Override
-        public Uri insert( Uri uri, ContentValues values) {
+        public Uri insert(Uri uri, ContentValues values) {
             return null;
         }
 
         @Override
-        public int delete( Uri uri, String selection,
-                 String[] selectionArgs) {
+        public int delete(Uri uri, String selection, String[] selectionArgs) {
             return 0;
         }
 
         @Override
-        public int update( Uri uri,  ContentValues values,
-                String selection,String[] selectionArgs) {
+        public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
             return 0;
         }
     }
 
-    ContentResolver getContentResolver()
-    {
+    ContentResolver getContentResolver() {
         ContentResolver realResolver = getContext().getContentResolver();
         if (realResolver == null) {
             throw new SQLException("mockResolver is NULL");
@@ -265,8 +260,7 @@ public class HistoryLogTest extends AndroidTestCase {
         return realResolver;
     }
 
-    MockContentResolver getMokResolver()
-    {
+    MockContentResolver getMokResolver() {
         MockContentResolver mockResolver = new MockContentResolver();
         if (mockResolver == null) {
             throw new SQLException("mockResolver is NULL");
@@ -274,9 +268,9 @@ public class HistoryLogTest extends AndroidTestCase {
         return mockResolver;
     }
 
-    ContentProvider getContentProvider(ContentResolver resolver,Uri uri)
-    {
-        ContentProvider provider=resolver.acquireContentProviderClient(uri).getLocalContentProvider();
+    ContentProvider getContentProvider(ContentResolver resolver, Uri uri) {
+        ContentProvider provider = resolver.acquireContentProviderClient(uri)
+                .getLocalContentProvider();
         if (provider == null) {
             throw new SQLException("mockResolver is NULL");
         }
@@ -289,127 +283,109 @@ public class HistoryLogTest extends AndroidTestCase {
         ContentResolver mRealResolver = null;
         MockContentResolver mockResolver = null;
         ContentProvider provider;
-        mRealResolver=getContentResolver();
+        mRealResolver = getContentResolver();
 
-            mockResolver = new MockContentResolver();
+        mockResolver = new MockContentResolver();
 
-            iContext = new IsolatedContext(mockResolver, super.getContext());
-            mStrMsgAuthority = MessageData.CONTENT_URI.getAuthority();
-            mStrFTAuthority = FileTransferData.CONTENT_URI.getAuthority();
-            mStrImgAuthority = ImageSharingData.CONTENT_URI.getAuthority();
-            mStrVideoAuthority = VideoSharingData.CONTENT_URI.getAuthority();
-            mStrGeolocAuthority = GeolocSharingData.CONTENT_URI.getAuthority();
-            mStrHistoryAuthority = HistoryLogData.CONTENT_URI.getAuthority();
-            if (mStrMsgAuthority.isEmpty() || mStrFTAuthority.isEmpty()
-                    || mStrImgAuthority.isEmpty() || mStrVideoAuthority.isEmpty()
-                    || mStrGeolocAuthority.isEmpty() || mStrHistoryAuthority.isEmpty()) {
-                throw new IllegalStateException("Authority is Empty");
-            }
+        iContext = new IsolatedContext(mockResolver, super.getContext());
+        mStrMsgAuthority = MessageData.CONTENT_URI.getAuthority();
+        mStrFTAuthority = FileTransferData.CONTENT_URI.getAuthority();
+        mStrImgAuthority = ImageSharingData.CONTENT_URI.getAuthority();
+        mStrVideoAuthority = VideoSharingData.CONTENT_URI.getAuthority();
+        mStrGeolocAuthority = GeolocSharingData.CONTENT_URI.getAuthority();
+        mStrHistoryAuthority = HistoryLogData.CONTENT_URI.getAuthority();
+        if (mStrMsgAuthority.isEmpty() || mStrFTAuthority.isEmpty() || mStrImgAuthority.isEmpty()
+                || mStrVideoAuthority.isEmpty() || mStrGeolocAuthority.isEmpty()
+                || mStrHistoryAuthority.isEmpty()) {
+            throw new IllegalStateException("Authority is Empty");
+        }
 
+        mockResolver = getMokResolver();
 
-        mockResolver=getMokResolver();
+        provider = getContentProvider(mRealResolver, Message.CONTENT_URI);
 
-            provider = getContentProvider(mRealResolver, Message.CONTENT_URI);
+        mockResolver.addProvider(mStrMsgAuthority, provider);
 
-            mockResolver.addProvider(mStrMsgAuthority, provider);
+        provider = getContentProvider(mRealResolver, FileTransferLog.CONTENT_URI);
 
-            provider = getContentProvider(mRealResolver, FileTransferLog.CONTENT_URI);
+        mockResolver.addProvider(mStrFTAuthority, provider);
 
-            mockResolver.addProvider(mStrFTAuthority, provider);
+        provider = getContentProvider(mRealResolver, ImageSharingLog.CONTENT_URI);
 
-            provider = Objects.requireNonNull(
-                    mRealResolver.acquireContentProviderClient(ImageSharingLog.CONTENT_URI))
-                    .getLocalContentProvider();
-            mockResolver.addProvider(mStrImgAuthority, Objects.requireNonNull(provider));
+        mockResolver.addProvider(mStrImgAuthority, provider);
 
-            provider = Objects.requireNonNull(
-                    mRealResolver.acquireContentProviderClient(VideoSharingLog.CONTENT_URI))
-                    .getLocalContentProvider();
-            mockResolver.addProvider(mStrVideoAuthority, Objects.requireNonNull(provider));
+        provider = getContentProvider(mRealResolver, VideoSharingLog.CONTENT_URI);
 
-            provider = Objects.requireNonNull(
-                    mRealResolver.acquireContentProviderClient(GeolocSharingLog.CONTENT_URI))
-                    .getLocalContentProvider();
-            mockResolver.addProvider(mStrGeolocAuthority, Objects.requireNonNull(provider));
+        mockResolver.addProvider(mStrVideoAuthority, provider);
 
-            HistoryProvider historyProvider = (HistoryProvider) Objects.requireNonNull(
-                    mRealResolver.acquireContentProviderClient(HistoryLog.CONTENT_URI))
-                    .getLocalContentProvider();
+        provider = getContentProvider(mRealResolver, GeolocSharingLog.CONTENT_URI);
 
-            mockResolver.addProvider(mStrHistoryAuthority, Objects.requireNonNull(historyProvider));
-            mockResolver.addProvider(EXTERNAL_AUTHORITY, sMyContentProvider);
-            historyProvider.registerInternalProviders();
+        mockResolver.addProvider(mStrGeolocAuthority, provider);
 
-            sMyContentProvider.attachInfo(iContext, null);
-            sMyContentProvider.setQueried(false);
+        HistoryProvider historyProvider = (HistoryProvider) getContentProvider(mRealResolver,
+                HistoryLog.CONTENT_URI);
 
-            setContext(iContext);
+        mockResolver.addProvider(mStrHistoryAuthority, historyProvider);
+        mockResolver.addProvider(EXTERNAL_AUTHORITY, sMyContentProvider);
+        historyProvider.registerInternalProviders();
 
-            if (sLocalContentResolver == null) {
-                sLocalContentResolver = new LocalContentResolver(mockResolver);
-            }
-            mMessagingLog = MessagingLog.getInstance(sLocalContentResolver,
-                    RcsSettings.getInstance(sLocalContentResolver));
-            RichCallHistory.getInstance(sLocalContentResolver);
-            mRichCallHistory = RichCallHistory.getInstance();
-            mContactUtil = ContactUtil.getInstance(new ContactUtilMockContext(
-                    new ContactUtilMockContext(getContext())));
+        sMyContentProvider.attachInfo(iContext, null);
+        sMyContentProvider.setQueried(false);
 
-            provider = Objects.requireNonNull(
-                    mRealResolver.acquireContentProviderClient(MessageData.CONTENT_URI))
-                    .getLocalContentProvider();
-            mockResolver.addProvider(mStrMsgAuthority, Objects.requireNonNull(provider));
+        setContext(iContext);
 
-            provider = Objects.requireNonNull(
-                    mRealResolver.acquireContentProviderClient(FileTransferData.CONTENT_URI))
-                    .getLocalContentProvider();
-            mockResolver.addProvider(mStrFTAuthority, Objects.requireNonNull(provider));
+        if (sLocalContentResolver == null) {
+            sLocalContentResolver = new LocalContentResolver(mockResolver);
+        }
+        mMessagingLog = MessagingLog.getInstance(sLocalContentResolver,
+                RcsSettings.getInstance(sLocalContentResolver));
+        RichCallHistory.getInstance(sLocalContentResolver);
+        mRichCallHistory = RichCallHistory.getInstance();
+        mContactUtil = ContactUtil.getInstance(new ContactUtilMockContext(
+                new ContactUtilMockContext(getContext())));
 
-            provider = Objects.requireNonNull(
-                    mRealResolver.acquireContentProviderClient(ImageSharingData.CONTENT_URI))
-                    .getLocalContentProvider();
-            mockResolver.addProvider(mStrImgAuthority, Objects.requireNonNull(provider));
+        provider = getContentProvider(mRealResolver, MessageData.CONTENT_URI);
 
-            provider = Objects.requireNonNull(
-                    mRealResolver.acquireContentProviderClient(VideoSharingData.CONTENT_URI))
-                    .getLocalContentProvider();
-            mockResolver.addProvider(mStrVideoAuthority, Objects.requireNonNull(provider));
+        mockResolver.addProvider(mStrMsgAuthority, provider);
 
-            provider = Objects.requireNonNull(
-                    mRealResolver.acquireContentProviderClient(GeolocSharingData.CONTENT_URI))
-                    .getLocalContentProvider();
-            mockResolver.addProvider(mStrGeolocAuthority, Objects.requireNonNull(provider));
+        provider = getContentProvider(mRealResolver, FileTransferData.CONTENT_URI);
+        mockResolver.addProvider(mStrFTAuthority, provider);
 
-            provider = Objects.requireNonNull(
-                    mRealResolver.acquireContentProviderClient(HistoryLogData.CONTENT_URI))
-                    .getLocalContentProvider();
+        provider = getContentProvider(mRealResolver, ImageSharingData.CONTENT_URI);
+        mockResolver.addProvider(mStrImgAuthority, provider);
 
-            mockResolver.addProvider(mStrHistoryAuthority, Objects.requireNonNull(provider));
+        provider = getContentProvider(mRealResolver, VideoSharingData.CONTENT_URI);
 
-            assert sLocalContentResolver != null;
-            sLocalContentResolver.delete(MessageData.CONTENT_URI, null, null);
-            sLocalContentResolver.delete(ImageSharingData.CONTENT_URI, null, null);
-            sLocalContentResolver.delete(VideoSharingData.CONTENT_URI, null, null);
-            sLocalContentResolver.delete(GeolocSharingData.CONTENT_URI, null, null);
+        mockResolver.addProvider(mStrVideoAuthority, provider);
 
+        provider = getContentProvider(mRealResolver, GeolocSharingData.CONTENT_URI);
+        mockResolver.addProvider(mStrGeolocAuthority, provider);
 
-                SQLiteDatabase dbft = getContext().openOrCreateDatabase(
-                        FileTransferProvider.DATABASE_NAME, Context.MODE_PRIVATE, null);
-                dbft.delete(FileTransferProvider.TABLE, null, null);
-                dbft.close();
+        provider = getContentProvider(mRealResolver, HistoryLogData.CONTENT_URI);
 
+        mockResolver.addProvider(mStrHistoryAuthority, provider);
 
-            sHistoryService = new HistoryServiceImpl(getContext());
+        assert sLocalContentResolver != null;
+        sLocalContentResolver.delete(MessageData.CONTENT_URI, null, null);
+        sLocalContentResolver.delete(ImageSharingData.CONTENT_URI, null, null);
+        sLocalContentResolver.delete(VideoSharingData.CONTENT_URI, null, null);
+        sLocalContentResolver.delete(GeolocSharingData.CONTENT_URI, null, null);
 
-            getContext().deleteDatabase(EXTERNAL_DATABASE_NAME);
-            SQLiteDatabase db = getContext().openOrCreateDatabase(EXTERNAL_DATABASE_NAME,
-                    Context.MODE_PRIVATE, null);
-            db.execSQL(EXTERNAL_TABLE_CREATE);
-            db.delete(EXTERNAL_TABLE, null, null);
-            db.close();
-            mTimestamp = mRandom.nextLong();
-            mTimestampSent = mRandom.nextLong();
+        SQLiteDatabase dbft = getContext().openOrCreateDatabase(FileTransferProvider.DATABASE_NAME,
+                Context.MODE_PRIVATE, null);
+        dbft.delete(FileTransferProvider.TABLE, null, null);
+        dbft.close();
 
+        sHistoryService = new HistoryServiceImpl(getContext());
+
+        getContext().deleteDatabase(EXTERNAL_DATABASE_NAME);
+        SQLiteDatabase db = getContext().openOrCreateDatabase(EXTERNAL_DATABASE_NAME,
+                Context.MODE_PRIVATE, null);
+        db.execSQL(EXTERNAL_TABLE_CREATE);
+        db.delete(EXTERNAL_TABLE, null, null);
+        db.close();
+        mTimestamp = mRandom.nextLong();
+        mTimestampSent = mRandom.nextLong();
 
     }// setup
 
@@ -696,7 +672,7 @@ public class HistoryLogTest extends AndroidTestCase {
             sHistoryService.registerExtraHistoryLogMember(INVALID_EXTERNAL_PROVIDER_ID,
                     EXTERNAL_URI, database, EXTERNAL_TABLE, columnMapping);
             fail();
-        } catch (Exception ignore) {
+        } catch (RemoteException ignore) {
         }
     }
 
@@ -711,7 +687,7 @@ public class HistoryLogTest extends AndroidTestCase {
                     Uri.fromFile(getContext().getDatabasePath(RcsSettingsProvider.DATABASE_NAME)),
                     EXTERNAL_TABLE, columnMapping);
             fail();
-        } catch (Exception ignore) {
+        } catch (RemoteException e) {
         }
 
         try {
@@ -719,7 +695,8 @@ public class HistoryLogTest extends AndroidTestCase {
                     Uri.fromFile(getContext().getDatabasePath(ContactProvider.DATABASE_NAME)),
                     EXTERNAL_TABLE, columnMapping);
             fail();
-        } catch (Exception ignore) {
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
 
@@ -732,7 +709,8 @@ public class HistoryLogTest extends AndroidTestCase {
             sHistoryService.registerExtraHistoryLogMember(EXTERNAL_PROVIDER_ID, EXTERNAL_URI,
                     database, EXTERNAL_TABLE, null);
             fail();
-        } catch (Exception ignore) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -749,36 +727,35 @@ public class HistoryLogTest extends AndroidTestCase {
         addItems(); // 5
         ContentResolver cResolver;
         Cursor curs;
-        try {
-            cResolver = getContext().getContentResolver();
-            if (cResolver == null) {
-                throw new NullPointerException();
-            }
-            curs = cResolver.query(getUriWithAllInternalProviders(), null, null, null, null);
-            if (curs == null) {
-                throw new NullPointerException();
-            }
-            assertEquals(5, curs.getCount());
 
-            try {
-                curs = cResolver.query(createHistoryUri(1), null, "_id = 1;DROP TABLE MESSAGE;",
-                        null, null);
-                if (curs == null) {
-                    throw new NullPointerException();
-                }
-                curs.close();
-                fail();
-            } catch (Exception e) {
-                addOutgoingOneToOneChatMessages("AnotherOne"); // 1
-                curs = cResolver.query(getUriWithAllInternalProviders(), null, null, null, null);
-                if (curs == null) {
-                    throw new NullPointerException();
-                }
-
-                assertEquals(6, curs.getCount());
-            }
-        } catch (Exception ignore) {
+        cResolver = getContext().getContentResolver();
+        if (cResolver == null) {
+            throw new NullPointerException();
         }
+        curs = cResolver.query(getUriWithAllInternalProviders(), null, null, null, null);
+        if (curs == null) {
+            throw new SQLiteException();
+        }
+        assertEquals(5, curs.getCount());
+
+        curs = cResolver
+                .query(createHistoryUri(1), null, "_id = 1;DROP TABLE MESSAGE;", null, null);
+        if (curs == null) {
+            throw new SQLiteException();
+        }
+        curs.close();
+        fail();
+
+        addOutgoingOneToOneChatMessages("AnotherOne"); // 1
+        curs = cResolver.query(getUriWithAllInternalProviders(), null, null, null, null);
+        if (curs == null) {
+            throw new SQLiteException();
+        }
+
+        assertEquals(6, curs.getCount());
+        if (curs != null)
+            curs.close();
+
     }
 
     public void testSQLInjection_sort() throws RemoteException, RcsPermissionDeniedException,
@@ -786,63 +763,58 @@ public class HistoryLogTest extends AndroidTestCase {
         addItems(); // 5
         ContentResolver cResolver;
         Cursor curs;
-        try {
-            cResolver = getContext().getContentResolver();
-            if (cResolver == null) {
-                throw new NullPointerException();
-            }
-            curs = cResolver
-                    .query(createHistoryUri(1), null, null, null, "_id;DROP TABLE MESSAGE;");
-            if (curs == null) {
-                throw new NullPointerException();
-            }
-            curs.close();
-            curs = cResolver.query(getUriWithAllInternalProviders(), null, null, null, null);
-            if (curs == null) {
-                throw new NullPointerException();
-            }
-            addOutgoingOneToOneChatMessages("AnotherOne"); // 1
-            assertEquals(6, curs.getCount());
-        } catch (Exception ignore) {
+
+        cResolver = getContext().getContentResolver();
+        if (cResolver == null) {
+            throw new SQLiteException();
         }
+        curs = cResolver.query(createHistoryUri(1), null, null, null, "_id;DROP TABLE MESSAGE;");
+        if (curs == null) {
+            throw new SQLiteException();
+        }
+        curs.close();
+        curs = cResolver.query(getUriWithAllInternalProviders(), null, null, null, null);
+        if (curs == null) {
+            throw new SQLiteException();
+        }
+        addOutgoingOneToOneChatMessages("AnotherOne"); // 1
+        assertEquals(6, curs.getCount());
+        curs.close();
     }
 
     public void testSQLInjection_tablename() throws RemoteException, RcsPermissionDeniedException,
             PayloadException, IOException {
         addItems(); // 5
         ContentResolver contResolv;
-        Cursor cursor = null;
-        try {
-            contResolv = getContext().getContentResolver();
+        Cursor cursor;
 
-            if (contResolv == null) {
-                throw new NullPointerException();
-            }
-            cursor = contResolv.query(getUriWithAllInternalProviders(), null, null, null, null);
-            if (cursor == null) {
-                throw new NullPointerException();
-            }
-            assertEquals(5, cursor.getCount());
+        contResolv = getContext().getContentResolver();
 
-            Uri database = Uri.fromFile(getContext().getDatabasePath(EXTERNAL_DATABASE_NAME));
-            sHistoryService.registerExtraHistoryLogMember(EXTERNAL_PROVIDER_ID, EXTERNAL_URI,
-                    database, EXTERNAL_TABLE + ";DROP TABLE MESSAGE;", getExternalColumnMapping());
-
-            Uri uriProvider = getUriWithAllInternalProviders();
-            if (uriProvider == null) {
-                throw new NullPointerException();
-            }
-            addOutgoingOneToOneChatMessages("YetAnotherOne"); // 1
-            cursor = contResolv.query(uriProvider, null, null, null, null);
-            if (cursor == null) {
-                throw new NullPointerException();
-            }
-            assertEquals(6, cursor.getCount());
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
+        if (contResolv == null) {
+            throw new SQLiteException();
         }
+        cursor = contResolv.query(getUriWithAllInternalProviders(), null, null, null, null);
+        if (cursor == null) {
+            throw new SQLiteException();
+        }
+        assertEquals(5, cursor.getCount());
+
+        Uri database = Uri.fromFile(getContext().getDatabasePath(EXTERNAL_DATABASE_NAME));
+        sHistoryService.registerExtraHistoryLogMember(EXTERNAL_PROVIDER_ID, EXTERNAL_URI, database,
+                EXTERNAL_TABLE + ";DROP TABLE MESSAGE;", getExternalColumnMapping());
+
+        Uri uriProvider = getUriWithAllInternalProviders();
+        if (uriProvider == null) {
+            throw new SQLiteException();
+        }
+        addOutgoingOneToOneChatMessages("YetAnotherOne"); // 1
+        cursor = contResolv.query(uriProvider, null, null, null, null);
+        if (cursor == null) {
+            throw new SQLiteException();
+        }
+        assertEquals(6, cursor.getCount());
+
+        cursor.close();
 
     }
 
